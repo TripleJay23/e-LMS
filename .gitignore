@@ -1,2 +1,5 @@
 .env
 moodledata/
+moodle/config.php
+nginx.conf
+logs/
