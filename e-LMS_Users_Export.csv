@@ -1,7 +1,5 @@
 ID,Username,"First Name","Last Name",Email,Institution,Department,"ID Number","Auth Method",Roles,"Created Date"
 13,dr_achieng,"Dr. Jane",Achieng,jane.achieng@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-46,hod_bcs,"Dr. Head",BCS,hod.bcs@example.com,,,,manual,manager,"2026-02-14 01:14:24"
-45,hod_bit,"Dr. Head",BIT,hod.bit@example.com,,,,manual,manager,"2026-02-14 01:14:24"
 5,student,Chuse,Decino,Decino@gmail.com,,,,manual,,"2026-02-12 16:42:10"
 3,test_facilitator,Test,Facilitator,facilitator@example.com,,,,manual,,"2026-02-12 11:36:56"
 44,hod_informatics,"Dr. Head",Informatics,hod.informatics@example.com,,,,manual,manager,"2026-02-13 20:22:03"
