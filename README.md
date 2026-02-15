@@ -12,11 +12,11 @@ This is a Moodle-based e-Learning Management System customized for the Faculty o
 
 ### Users
 
-- **Total Users:** 43
-  - Students: 30
-  - Teachers: 8 (editingteacher)
+- **Total Users:** 39
+  - Students: 28
+  - Teachers: 7 (editingteacher)
   - Managers: 1 (hod_informatics - system-wide access)
-  - Unassigned: 4
+  - Unassigned: 3
 
 ### Courses
 
