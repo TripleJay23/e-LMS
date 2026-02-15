@@ -1,125 +1,137 @@
-#!/usr/bin/env php
 <?php
-/**
- * Update Course Descriptions
- * Adds professional descriptions with semester, program, and credit info
- */
-
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
-require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->libdir . '/filelib.php');
 
-echo "╔════════════════════════════════════════════════════════╗\n";
-echo "║      Updating Course Descriptions                     ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n\n";
+// --- CONFIGURATION ---
+$imagesDir = 'c:\Users\jtrip\Desktop\Group 07\e-LMS\images';
 
-// Load module data
-$modules_json = file_get_contents(__DIR__ . '/../modules_categorized.json');
-$modules_data = json_decode($modules_json, true);
+// Scan for images dynamically
+$imageFiles = [];
+$patterns = ['*.jpg', '*.jpeg', '*.png', '*.gif'];
+$excludedImages = ['210051270_10847226.png'];
 
-// Create lookup table: code => module info
-$module_lookup = [];
-foreach ($modules_data['shared'] as $mod) {
-   $module_lookup[$mod['code']] = $mod + ['program' => 'Both BIT and BCS'];
-}
-foreach ($modules_data['bit_only'] as $mod) {
-   $module_lookup[$mod['code']] = $mod + ['program' => 'BIT Only'];
-}
-foreach ($modules_data['bcs_only'] as $mod) {
-   $module_lookup[$mod['code']] = $mod + ['program' => 'BCS Only'];
+foreach ($patterns as $pattern) {
+    foreach (glob($imagesDir . DIRECTORY_SEPARATOR . $pattern) as $filename) {
+        $basename = basename($filename);
+        if (!in_array($basename, $excludedImages)) {
+            $imageFiles[] = $basename;
+        }
+    }
 }
 
-// Get all courses
-$courses = $DB->get_records_select('course', 'id > 1', null, 'shortname');
+if (empty($imageFiles)) {
+    die("Error: No images found in " . $imagesDir . "\n");
+}
 
-$updated = 0;
+echo "Found " . count($imageFiles) . " images to cycle through.\n";
+
+// --- MAIN LOOP ---
+
+$courses = $DB->get_records('course', [], 'sortorder ASC');
+$fs = get_file_storage();
+$imageIndex = 0;
+$updatedCount = 0;
+
+echo "\nStarting Course Description Update...\n";
+echo str_repeat('-', 60) . "\n";
 
 foreach ($courses as $course) {
-   // Extract base code (remove -BIT/-BCS suffix)
-   $base_code = preg_replace('/-BIT|-BCS/', '', $course->shortname);
+    if ($course->id == 1) continue; // Skip site course
 
-   if (!isset($module_lookup[$base_code])) {
-      echo "⚠ Skipping {$course->shortname}: No module data found\n";
-      continue;
-   }
+    // Derive Metadata from Category Structure
+    $meta = [
+        'program' => 'Informatics',
+        'year' => 'N/A',
+        'semester' => 'N/A',
+        'code' => $course->shortname
+    ];
 
-   $mod = $module_lookup[$base_code];
+    $category = $DB->get_record('course_categories', ['id' => $course->category]);
+    if ($category) {
+        // Traverse up
+        $path = $category->path; // e.g., /1/2/3
+        $catIds = explode('/', trim($path, '/'));
 
-   // Determine semester year
-   $sem_upper = strtoupper($mod['semester']);
-   if (strpos($sem_upper, 'SEMESTER I') !== false && strpos($sem_upper, 'II') === false && strpos($sem_upper, 'IV') === false && strpos($sem_upper, 'VI') === false) {
-      $year = 1; // Semester I
-   } elseif (strpos($sem_upper, 'SEMESTER II') !== false && strpos($sem_upper, 'III') === false) {
-      $year = 1; // Semester II
-   } elseif (strpos($sem_upper, 'SEMESTER III') !== false) {
-      $year = 2; // Semester III
-   } elseif (strpos($sem_upper, 'SEMESTER IV') !== false) {
-      $year = 2; // Semester IV
-   } elseif (strpos($sem_upper, 'SEMESTER V') !== false && strpos($sem_upper, 'VI') === false) {
-      $year = 3; // Semester V
-   } elseif (strpos($sem_upper, 'SEMESTER VI') !== false) {
-      $year = 3; // Semester VI
-   } else {
-      $year = 1; // Default fallback
-   }
+        foreach ($catIds as $catId) {
+            $cat = $DB->get_record('course_categories', ['id' => $catId]);
+            if (!$cat) continue;
 
-   // Build professional description
-   $description = "
-<div style='line-height: 1.6;'>
-    <h3>{$course->fullname}</h3>
-    
-    <table style='margin: 15px 0; border-collapse: collapse;'>
-        <tr>
-            <td style='padding: 5px 15px 5px 0; font-weight: bold;'>Program:</td>
-            <td style='padding: 5px 0;'>{$mod['program']}</td>
-        </tr>
-        <tr>
-            <td style='padding: 5px 15px 5px 0; font-weight: bold;'>Year & Semester:</td>
-            <td style='padding: 5px 0;'>Year {$year}, {$mod['semester']}</td>
-        </tr>
-        <tr>
-            <td style='padding: 5px 15px 5px 0; font-weight: bold;'>Credit Hours:</td>
-            <td style='padding: 5px 0;'>{$mod['credits']}</td>
-        </tr>
-        <tr>
-            <td style='padding: 5px 15px 5px 0; font-weight: bold;'>Type:</td>
-            <td style='padding: 5px 0;'>{$mod['type']}</td>
-        </tr>
-    </table>
-    
-    <p><strong>Course Code:</strong> {$course->shortname}</p>
-    
-    <p style='margin-top: 15px;'>This course is structured into comprehensive topics covering essential aspects of {$course->fullname}. Each topic includes study materials, practice exercises, and assessments to ensure thorough understanding and practical application of concepts.</p>
-</div>
-";
+            $name = $cat->name;
+            if (stripos($name, 'BIT') !== false) $meta['program'] = 'BIT (Bachelor in Information Technology)';
+            if (stripos($name, 'BCS') !== false) $meta['program'] = 'BCS (Bachelor in Computer Science)';
+            if (stripos($name, 'Shared') !== false) $meta['program'] = 'Shared Module (BIT & BCS)';
 
-   // Update course
-   try {
-      $course_update = new stdClass();
-      $course_update->id = $course->id;
-      $course_update->summary = $description;
-      $course_update->summaryformat = FORMAT_HTML;
+            if (stripos($name, 'Year 1') !== false) $meta['year'] = 'Year 1';
+            if (stripos($name, 'Year 2') !== false) $meta['year'] = 'Year 2';
+            if (stripos($name, 'Year 3') !== false) $meta['year'] = 'Year 3';
 
-      $DB->update_record('course', $course_update);
-      $updated++;
+            if (stripos($name, 'Semester 1') !== false || stripos($name, 'Semester I') !== false) $meta['semester'] = 'Semester I';
+            if (stripos($name, 'Semester 2') !== false || stripos($name, 'Semester II') !== false) $meta['semester'] = 'Semester II';
+        }
+    }
 
-      // Rebuild course cache
-      rebuild_course_cache($course->id, true);
-   } catch (Exception $e) {
-      echo "  ❌ Error updating {$course->shortname}: " . $e->getMessage() . "\n";
-   }
+    // Select Image (Round Robin)
+    $sourceImageName = $imageFiles[$imageIndex % count($imageFiles)];
+    $sourceImagePath = $imagesDir . DIRECTORY_SEPARATOR . $sourceImageName;
+    $imageIndex++;
+
+    // Context
+    $context = context_course::instance($course->id);
+
+    // 1. Delete existing summary files to keep it clean (removed to prevent deleting existing valid images if run multiple times, 
+    // actually, let's keep it to ensure we replace the old one if we are re-running for update)
+    // $fs->delete_area_files($context->id, 'course', 'summary'); 
+
+    // 2. Upload New Image
+    $fileRecord = [
+        'contextid' => $context->id,
+        'component' => 'course',
+        'filearea'  => 'summary',
+        'itemid'    => 0,
+        'filepath'  => '/',
+        'filename'  => $sourceImageName,
+    ];
+
+    // Check if exact file already exists
+    $existingFile = $fs->get_file($context->id, 'course', 'summary', 0, '/', $sourceImageName);
+    if ($existingFile) {
+        $existingFile->delete();
+    }
+
+    $fs->create_file_from_pathname($fileRecord, $sourceImagePath);
+
+    // 3. Generate HTML Template
+    // The @@PLUGINFILE@@ token is replaced by Moodle at runtime
+    $imageUrl = "@@PLUGINFILE@@/" . $sourceImageName;
+
+    $descriptionHtml = '
+<div class="course-description-container" style="font-family: sans-serif; color: #333;">
+    <div class="course-image-wrapper" style="text-align: center; margin-bottom: 20px;">
+        <img src="' . $imageUrl . '" alt="' . htmlspecialchars($course->fullname) . '" class="img-fluid" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    </div>
+
+    <div class="course-metadata" style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #007bff; margin-bottom: 20px;">
+        <div style="margin-bottom: 5px;"><strong>Program:</strong> ' . htmlspecialchars($meta['program']) . '</div>
+        <div style="margin-bottom: 5px;"><strong>Year:</strong> ' . htmlspecialchars($meta['year']) . '</div>
+        <div style="margin-bottom: 5px;"><strong>Semester:</strong> ' . htmlspecialchars($meta['semester']) . '</div>
+        <div><strong>Course Code:</strong> ' . htmlspecialchars($meta['code']) . '</div>
+    </div>
+
+    <div class="course-summary-text">
+        <p>' . htmlspecialchars($course->fullname) . ' provides comprehensive coverage of key concepts. Students will engage with theoretical foundations and practical applications designed to build competency in this subject area.</p>
+    </div>
+</div>';
+
+    // 4. Update Course Record
+    $course->summary = $descriptionHtml;
+    $course->summaryformat = FORMAT_HTML;
+    $DB->update_record('course', $course);
+
+    echo "Updated: [{$course->shortname}] {$course->fullname} | {$meta['program']} - {$meta['year']}\n";
+    $updatedCount++;
 }
 
-echo "\n╔════════════════════════════════════════════════════════╗\n";
-echo "║         Description Update Complete! ✓                ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n\n";
-
-echo "Summary:\n";
-echo "  • Courses updated: $updated\n\n";
-
-echo "Result:\n";
-echo "  All courses now have professional descriptions with:\n";
-echo "  - Program information (BIT/BCS/Both)\n";
-echo "  - Year and semester details\n";
-echo "  - Credit hours\n";
-echo "  - Course type\n";
+echo str_repeat('-', 60) . "\n";
+echo "Completed! Updated $updatedCount courses.\n";
+echo "IMPORTANT: Run 'php moodle/admin/cli/purge_caches.php' to see changes.\n";

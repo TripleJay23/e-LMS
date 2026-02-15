@@ -3,3 +3,4 @@ moodledata/
 moodle/config.php
 nginx.conf
 logs/
+images/
