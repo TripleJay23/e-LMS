@@ -1,0 +1,375 @@
+// Modern Blue Theme - Custom SCSS
+
+// --- Variables ---
+$primary: #3b82f6 !default; // Modern Blue (Tailwind-like Blue-500)
+$secondary: #6b7280 !default; // Cool Gray
+$success: #10b981 !default;
+$info: #3b82f6 !default;
+$warning: #f59e0b !default;
+$danger: #ef4444 !default;
+$light: #f3f4f6 !default;
+$dark: #1f2937 !default;
+
+$body-bg: #f0f2f5 !default;
+$card-bg: #ffffff !default;
+$font-family-sans-serif:
+  "Inter",
+  system-ui,
+  -apple-system,
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  Arial,
+  sans-serif !default;
+
+// --- Mixins ---
+@mixin glassmorphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@mixin transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// --- Global Styles ---
+body {
+  background-color: $body-bg;
+  color: $dark;
+  font-family: $font-family-sans-serif;
+}
+
+a {
+  color: $primary;
+  @include transition-smooth;
+  &:hover {
+    color: darken($primary, 10%);
+    text-decoration: none;
+  }
+}
+
+// --- Layout Components ---
+
+// Header
+.navbar-bootswatch,
+.navbar.fixed-top {
+  background-color: $primary !important;
+  border-bottom: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  // Force all text white by default in the header
+  color: white !important;
+
+  .navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: white !important;
+  }
+
+  // Normal Nav Links
+  .nav-link {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: $primary !important;
+      background-color: white !important;
+    }
+  }
+
+  // Edit Mode Label / Switch
+  .editmode-switch-form,
+  .d-flex.align-items-center {
+    color: white !important;
+    label {
+      color: white !important;
+    }
+  }
+
+  // User Menu / Dropdowns (Reset color for dropdowns)
+  .dropdown-menu {
+    .dropdown-item {
+      color: $dark !important;
+      &:hover {
+        background-color: $light;
+        color: $primary !important;
+      }
+    }
+  }
+
+  // Login Link - Catch-all for "Log in" text or link
+  // We target the typical Moodle login link structure
+  .login a,
+  .nav-link[href*="login"],
+  .nav-item.align-items-center .btn-secondary {
+    background-color: white !important;
+    color: $primary !important;
+    border: 2px solid white;
+    border-radius: 2rem;
+    padding: 0.4rem 1.25rem;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block; // Ensure it has dimensions
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+      color: darken($primary, 15%) !important;
+      background-color: #f8f9fa !important;
+      text-decoration: none;
+    }
+  }
+}
+
+// Sidebar / Drawer
+.drawer-content {
+  @include glassmorphism;
+  background: rgba(255, 255, 255, 0.85); // Slightly more opaque for readability
+}
+
+// Footer
+#page-footer {
+  background-color: transparent;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+}
+
+// --- Cards & Content ---
+
+.card {
+  border: none;
+  border-radius: 1rem; // More rounded
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background-color: $card-bg;
+  @include transition-smooth;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Login Page Specifics
+.pagelayout-login {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  #page {
+    background: transparent;
+    margin-top: 0 !important;
+  }
+
+  .login-container {
+    @include glassmorphism;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .login-logo {
+    margin-bottom: 2rem;
+  }
+}
+
+// Dashboard Course Cards & Layout
+// Widen the main container on dashboard
+#page-my-index {
+  #region-main-box {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    flex: 0 0 100%; // Ensure it takes full width
+    width: 100%;
+  }
+  #region-main {
+    overflow-x: visible;
+  }
+}
+
+// Target the dashboard course overview block specifically
+.block-myoverview {
+  .dashboard-card-deck {
+    // Enforce grid layout
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    .card.dashboard-card {
+      width: 100% !important;
+      max-width: none !important;
+      margin-bottom: 0 !important;
+      height: 100%; // Full height
+
+      .card-img-top {
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        height: 180px;
+        object-fit: cover;
+        background-color: #eee; // Fallback
+      }
+
+      .card-footer {
+        background-color: transparent;
+        border-top: none;
+      }
+    }
+  }
+}
+
+// Frontpage Course Grid (Available Courses)
+.frontpage-course-list-all,
+.frontpage-course-list-enrolled {
+  display: grid;
+  // Force 3 columns on desktop
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  // Responsive: 2 columns on tablets
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Responsive: 1 column on mobile
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+  margin-top: 2rem;
+
+  .coursebox {
+    background-color: $card-bg;
+    border: none;
+    border-radius: 1rem;
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.1),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+    margin-bottom: 0 !important; // Override default margin
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    @include transition-smooth;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .info {
+      margin-bottom: 1rem;
+      .coursename {
+        font-size: 1.25rem;
+        font-weight: 700;
+        a {
+          color: $dark;
+          &:hover {
+            color: $primary;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+
+    .content {
+      flex-grow: 1;
+
+      .summary {
+        font-size: 0.9rem;
+        color: $secondary;
+        margin-bottom: 1rem;
+      }
+
+      .courseimage {
+        img {
+          width: 100%;
+          height: 160px;
+          object-fit: cover;
+          border-radius: 0.5rem;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+
+    .moreinfo {
+      margin-top: auto;
+      text-align: right;
+    }
+  }
+}
+
+// Buttons
+.btn-primary {
+  background-color: $primary;
+  border-color: $primary;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  @include transition-smooth;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: darken($primary, 5%) !important;
+    border-color: darken($primary, 5%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
+  }
+}
+
+.btn-secondary {
+  background-color: white;
+  color: $dark;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-weight: 600;
+
+  &:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    color: $dark;
+  }
+}
+
+// --- Utilities ---
+.text-primary {
+  color: $primary !important;
+}
+.bg-primary {
+  background-color: $primary !important;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#page-content {
+  animation: fadeIn 0.5s ease-out;
+}

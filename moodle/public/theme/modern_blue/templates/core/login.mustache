@@ -1,0 +1,46 @@
+{{!
+    @template theme_modern_blue/login
+
+    Login page template for Modern Blue theme.
+}}
+{{> theme_boost/head }}
+
+<body {{{ bodyattributes }}}>
+{{> core/local/toast/wrapper}}
+
+<div id="page-wrapper" class="pagelayout-login">
+
+    {{{ output.standard_top_of_body_html }}}
+
+    <div id="page" class="container-fluid pt-5 mt-0">
+        <div id="page-content" class="row">
+            <div id="region-main-box" class="col-12 d-flex justify-content-center">
+                <section id="region-main" class="col-12 h-100" aria-label="{{#str}}content{{/str}}">
+                    <div class="login-wrapper">
+                        <div class="login-container glass-panel p-4">
+                            <div class="login-logo text-center mb-3">
+                                <img src="{{output.get_logo_url}}" alt="{{sitename}}" class="img-fluid" style="max-height: 80px;">
+                            </div>
+                            {{{ output.main_content }}}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    {{> theme_boost/footer }}
+</div>
+
+</body>
+</html>
+{{#js}}
+M.util.js_pending('theme_boost/loader');
+require(['theme_boost/loader'], function() {
+  M.util.js_complete('theme_boost/loader');
+});
+// Initialize our theme JS
+require(['theme_modern_blue/theme'], function(Theme) {
+    Theme.init();
+});
+{{/js}}

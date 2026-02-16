@@ -58,9 +58,9 @@ foreach ($courses as $course) {
             if (!$cat) continue;
 
             $name = $cat->name;
-            if (stripos($name, 'BIT') !== false) $meta['program'] = 'BIT (Bachelor in Information Technology)';
-            if (stripos($name, 'BCS') !== false) $meta['program'] = 'BCS (Bachelor in Computer Science)';
-            if (stripos($name, 'Shared') !== false) $meta['program'] = 'Shared Module (BIT & BCS)';
+            if (stripos($name, 'Information Technology') !== false || stripos($name, 'BIT') !== false) $meta['program'] = 'BIT (Bachelor in Information Technology)';
+           if (stripos($name, 'Computer Science') !== false || stripos($name, 'BCS') !== false) $meta['program'] = 'BCS (Bachelor in Computer Science)';
+           if (stripos($name, 'Shared') !== false) $meta['program'] = 'Shared Module (BIT & BCS)';
 
             if (stripos($name, 'Year 1') !== false) $meta['year'] = 'Year 1';
             if (stripos($name, 'Year 2') !== false) $meta['year'] = 'Year 2';
