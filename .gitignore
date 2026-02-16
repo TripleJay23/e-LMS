@@ -4,3 +4,4 @@ moodle/config.php
 nginx.conf
 logs/
 images/
+e-LMS_User_Export.csv

@@ -205,6 +205,37 @@ a {
   }
 }
 
+// Frontpage Layout - Widen container
+// Frontpage Layout - User Provided Fix
+#page.drawers .main-inner {
+  max-width: 10000px;
+  width: 1499px; // Keeping user's specific value
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  padding: 1.5rem 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 3rem;
+  flex: 1 0 auto;
+}
+
+@media (min-width: 768px) {
+  .pagelayout-standard #page.drawers .main-inner,
+  body.limitedwidth #page.drawers .main-inner {
+    max-width: 8300px;
+  }
+
+  #page.drawers .main-inner {
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (min-width: 576px) {
+  #page.drawers .main-inner {
+    margin-top: 1.5rem;
+  }
+}
+
 // Target the dashboard course overview block specifically
 .block-myoverview {
   .dashboard-card-deck {
