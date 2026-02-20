@@ -1,40 +1,124 @@
-ID,Username,"First Name","Last Name",Email,Institution,Department,"ID Number","Auth Method",Roles,"Created Date"
-13,dr_achieng,"Dr. Jane",Achieng,jane.achieng@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-44,hod_informatics,"Dr. Head",Informatics,hod.informatics@example.com,,,,manual,manager,"2026-02-13 20:22:03"
-8,dr_kamau,"Dr. Peter",Kamau,peter.kamau@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-12,prof_kimani,"Prof. John",Kimani,john.kimani@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-6,dr_mwangi,"Dr. James",Mwangi,james.mwangi@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-7,prof_njoroge,"Prof. Grace",Njoroge,grace.njoroge@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-10,mr_odhiambo,"Mr. David",Odhiambo,david.odhiambo@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-9,ms_otieno,"Ms. Sarah",Otieno,sarah.otieno@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
-29,bcs_y1_student1,"BCS Y1","Student 1",bcs_y1_student1@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-34,bcs_y2_student1,"BCS Y2","Student 1",bcs_y2_student1@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-39,bcs_y3_student1,"BCS Y3","Student 1",bcs_y3_student1@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-14,bit_y1_student1,"BIT Y1","Student 1",bit_y1_student1@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-19,bit_y2_student1,"BIT Y2","Student 1",bit_y2_student1@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-24,bit_y3_student1,"BIT Y3","Student 1",bit_y3_student1@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-30,bcs_y1_student2,"BCS Y1","Student 2",bcs_y1_student2@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-35,bcs_y2_student2,"BCS Y2","Student 2",bcs_y2_student2@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-40,bcs_y3_student2,"BCS Y3","Student 2",bcs_y3_student2@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-15,bit_y1_student2,"BIT Y1","Student 2",bit_y1_student2@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-20,bit_y2_student2,"BIT Y2","Student 2",bit_y2_student2@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-25,bit_y3_student2,"BIT Y3","Student 2",bit_y3_student2@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-31,bcs_y1_student3,"BCS Y1","Student 3",bcs_y1_student3@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-36,bcs_y2_student3,"BCS Y2","Student 3",bcs_y2_student3@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-41,bcs_y3_student3,"BCS Y3","Student 3",bcs_y3_student3@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-16,bit_y1_student3,"BIT Y1","Student 3",bit_y1_student3@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-21,bit_y2_student3,"BIT Y2","Student 3",bit_y2_student3@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-26,bit_y3_student3,"BIT Y3","Student 3",bit_y3_student3@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-32,bcs_y1_student4,"BCS Y1","Student 4",bcs_y1_student4@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-37,bcs_y2_student4,"BCS Y2","Student 4",bcs_y2_student4@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-42,bcs_y3_student4,"BCS Y3","Student 4",bcs_y3_student4@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-17,bit_y1_student4,"BIT Y1","Student 4",bit_y1_student4@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-22,bit_y2_student4,"BIT Y2","Student 4",bit_y2_student4@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-27,bit_y3_student4,"BIT Y3","Student 4",bit_y3_student4@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-33,bcs_y1_student5,"BCS Y1","Student 5",bcs_y1_student5@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-38,bcs_y2_student5,"BCS Y2","Student 5",bcs_y2_student5@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-43,bcs_y3_student5,"BCS Y3","Student 5",bcs_y3_student5@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-18,bit_y1_student5,"BIT Y1","Student 5",bit_y1_student5@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-23,bit_y2_student5,"BIT Y2","Student 5",bit_y2_student5@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-28,bit_y3_student5,"BIT Y3","Student 5",bit_y3_student5@student.example.com,,,,manual,student,"2026-02-13 12:13:59"
-11,dr_wanjiru,"Dr. Mary",Wanjiru,mary.wanjiru@example.com,,,,manual,editingteacher,"2026-02-13 12:12:37"
+﻿Username,"First Name","Last Name",Email,Role,Password,"Courses Teaching","Courses Enrolled"
+admin,Admin,User,jtriple188@gmail.com,Administrator,(Manual),,
+bcs_y1_student1,"BCS Y1","Student 1",bcs_y1_student1@student.example.com,Student,Student@2026,,"Computer Systems Architecture (ITU 07104)
+Discrete Mathematics (ITU 07210)
+Development Perspectives (ITU 07209)
+Business Communication (ITU 07101)
+Probability and Statistics (ITU 07213)
+Business Computer Applications (ITU 07102)
+Computer Fundamentals (ITU 07103)
+Foundation of Analysis (ITU 07107)
+Database Systems Development (ITU 07105)
+Principles of Programming (ITU 07212)
+Computer Networking (ITU 07208)
+Computer Graphic Design (ITU 07211)"
+bcs_y2_student1,"BCS Y2","Student 1",bcs_y2_student1@student.example.com,Student,Student@2026,,"Operating Systems (ITU 07320)
+Distributed Computing Systems (ITU 07318)
+Distributed Database (ITU 07317)
+Artificial Intelligence (ITU 07424)
+Internet Programming and Applications (ITU 07427)
+Entrepreneurship (ITU 07425)
+Web Design (ITU 07323)
+Research Methodology (ITU 07321)
+Object Oriented Programming (ITU 07322)
+Information Security (ITU 07426)
+System Analysis and Design (ITU 07428)
+Wireless Communication (ITU 07430)
+Industrial Practical Training (ITU 07431)"
+bcs_y3_student1,"BCS Y3","Student 1",bcs_y3_student1@student.example.com,Student,Student@2026,,"Interactive Multimedia (ITU 08107)
+Mobile Computing (ITU 08215)
+Computer Security (ITU 08213)
+Cryptology and Coding Theory (ITU 08211)
+Data Structure and Algorithms (ITU 08209)
+Individual Project (ITU 08217)
+Open Source Software Development (ITU 08102)
+Network Management and Administration (ITU 08105)
+Social and Ethical Issues in Computing (ITU 08103)
+IT Project Management (ITU 08101)
+Data Mining (ITU 08104)"
+bit_y1_student1,"BIT Y1","Student 1",bit_y1_student1@student.example.com,Student,Student@2026,,"Digital Logic and Computer Organization (ITU 07106)
+Database Implementation and Management (ITU 07214)
+Development Perspectives (ITU 07209)
+Business Communication (ITU 07101)
+Probability and Statistics (ITU 07213)
+Business Computer Applications (ITU 07102)
+Computer Fundamentals (ITU 07103)
+Foundation of Analysis (ITU 07107)
+Database Systems Development (ITU 07105)
+Principles of Programming (ITU 07212)
+Computer Networking (ITU 07208)
+Computer Graphic Design (ITU 07211)"
+bit_y2_student1,"BIT Y2","Student 1",bit_y2_student1@student.example.com,Student,Student@2026,,"Management Information Systems (ITU 07319)
+Data Routing and Switching (ITU 07316)
+Business Law (ITU 07315)
+Supporting Personal Computers (ITU 07429)
+Internet Programming and Applications (ITU 07427)
+Entrepreneurship (ITU 07425)
+Web Design (ITU 07323)
+Research Methodology (ITU 07321)
+Object Oriented Programming (ITU 07322)
+Information Security (ITU 07426)
+System Analysis and Design (ITU 07428)
+Wireless Communication (ITU 07430)
+Industrial Practical Training (ITU 07431)"
+bit_y3_student1,"BIT Y3","Student 1",bit_y3_student1@student.example.com,Student,Student@2026,,"Information System Auditing (ITU 08106)
+Programming for Mobile Device (ITU 08216)
+Information System Management (ITU 08214)
+Business Information System Re-engineering (ITU 08212)
+E-commerce and Technology (ITU 08210)
+Cybercrimes and Computer Law (ITU 08208)
+Individual Project (ITU 08217)
+Open Source Software Development (ITU 08102)
+Network Management and Administration (ITU 08105)
+Social and Ethical Issues in Computing (ITU 08103)
+IT Project Management (ITU 08101)
+Data Mining (ITU 08104)"
+dr_achieng,"Dr. Jane",Achieng,jane.achieng@example.com,Lecturer,Lecturer@2026,"Computer Systems Architecture (ITU 07104)
+Artificial Intelligence (ITU 07424)
+Cryptology and Coding Theory (ITU 08211)
+Database Implementation and Management (ITU 07214)
+Management Information Systems (ITU 07319)
+Information System Auditing (ITU 08106)
+Information System Management (ITU 08214)
+Computer Networking (ITU 07208)
+Network Management and Administration (ITU 08105)",
+dr_kamau,"Dr. Peter",Kamau,peter.kamau@example.com,Lecturer,Lecturer@2026,"Distributed Database (ITU 07317)
+Computer Security (ITU 08213)
+Data Routing and Switching (ITU 07316)
+Business Information System Re-engineering (ITU 08212)
+Business Computer Applications (ITU 07102)
+Object Oriented Programming (ITU 07322)
+System Analysis and Design (ITU 07428)
+Principles of Programming (ITU 07212)
+Social and Ethical Issues in Computing (ITU 08103)",
+dr_mwangi,"Dr. James",Mwangi,james.mwangi@example.com,Lecturer,Lecturer@2026,"Business Law (ITU 07315)
+E-commerce and Technology (ITU 08210)
+Business Communication (ITU 07101)
+Internet Programming and Applications (ITU 07427)
+Research Methodology (ITU 07321)
+Computer Graphic Design (ITU 07211)
+Open Source Software Development (ITU 08102)",
+dr_wanjiru,"Dr. Mary",Wanjiru,mary.wanjiru@example.com,Lecturer,Lecturer@2026,"Programming for Mobile Device (ITU 08216)
+Cybercrimes and Computer Law (ITU 08208)
+Probability and Statistics (ITU 07213)
+Computer Fundamentals (ITU 07103)
+Foundation of Analysis (ITU 07107)
+Web Design (ITU 07323)
+Data Mining (ITU 08104)",
+hod_informatics,"Dr. Head",Informatics,hod.informatics@example.com,"Head of Department",Head@2026,,
+mr_odhiambo,"Mr. David",Odhiambo,david.odhiambo@example.com,Lecturer,Lecturer@2026,"Distributed Computing Systems (ITU 07318)
+Interactive Multimedia (ITU 08107)
+Mobile Computing (ITU 08215)
+Supporting Personal Computers (ITU 07429)
+Information Security (ITU 07426)
+IT Project Management (ITU 08101)",
+ms_otieno,"Ms. Sarah",Otieno,sarah.otieno@example.com,Lecturer,Lecturer@2026,"Development Perspectives (ITU 07209)",
+prof_kimani,"Prof. John",Kimani,john.kimani@example.com,Lecturer,Lecturer@2026,"Discrete Mathematics (ITU 07210)
+Operating Systems (ITU 07320)
+Data Structure and Algorithms (ITU 08209)
+Wireless Communication (ITU 07430)
+Individual Project (ITU 08217)",
+prof_njoroge,"Prof. Grace",Njoroge,grace.njoroge@example.com,Lecturer,Lecturer@2026,"Digital Logic and Computer Organization (ITU 07106)
+Database Systems Development (ITU 07105)
+Entrepreneurship (ITU 07425)
+Industrial Practical Training (ITU 07431)",
