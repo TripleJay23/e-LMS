@@ -2,9 +2,11 @@
 
 ## Overview
 
-This is a Moodle-based e-Learning Management System customized for the Faculty of Informatics, supporting BIT (Bachelor in Information Technology) and BCS (Bachelor in Computer Science) programs.
+A Moodle-based e-Learning Management System customized for the Faculty of Informatics, supporting BIT (Bachelor in Information Technology) and BCS (Bachelor in Computer Science) programs.
 
-**System Status:** ✅ Fully Operational and Optimized
+**System Status:** ✅ Fully Operational  
+**Last Updated:** February 21, 2026  
+**Version:** 3.0
 
 ---
 
@@ -12,27 +14,19 @@ This is a Moodle-based e-Learning Management System customized for the Faculty o
 
 ### Users
 
-- **Total Users:** 39
-  - Students: 28
-  - Teachers: 7 (editingteacher)
-  - Managers: 1 (hod_informatics - system-wide access)
-  - Unassigned: 3
+- **Students:** 28
+- **Facilitators (Teachers):** 7
+- **HOD (Manager):** 1 — `hod_informatics` (system-wide access)
+- **Admin:** 1
 
 ### Courses
 
-- **Total Active Courses:** 48
-  - BIT Program courses
-  - BCS Program courses
-  - Shared modules (organized by Year/Semester)
+- **Total Active Courses:** 48 (BIT + BCS + Shared modules)
 - **HOD Access:** 100% (all courses visible)
 
-### System Health
+### Security
 
-- ✅ Caches purged and optimized
-- ✅ Logs cleared
-- ✅ No deprecated courses
-- ✅ All category structures organized
-- ✅ Database fully synchronized
+- ✅ Google reCAPTCHA v2 enabled on login, signup, and forgot-password pages
 
 ---
 
@@ -40,40 +34,36 @@ This is a Moodle-based e-Learning Management System customized for the Faculty o
 
 ### For Facilitators
 
-- ✅ Upload lecture materials (PDFs, videos)
-- ✅ Create quizzes and assessments with automatic grading
-- ✅ Grade student submissions
-- ✅ Track student progress
+- Upload lecture materials (PDFs, videos)
+- Create quizzes and assessments with automatic grading
+- Grade student submissions
+- Track student progress
 
 ### For Students
 
-- ✅ Self-registration via email
-- ✅ Access course materials
-- ✅ View and download PDFs
-- ✅ Watch video lectures
-- ✅ Take quizzes and view results
-- ✅ Track progress and grades
+- Self-registration via email with CAPTCHA protection
+- Access course materials, PDFs, and video lectures
+- Take quizzes and view results
+- Track progress and grades
 
 ### For HOD (Head of Department)
 
-- ✅ View all courses across programs (BIT & BCS)
-- ✅ Manage course content and structure
-- ✅ Oversee teacher assignments
-- ✅ Monitor student enrollment
+- View all courses across programs (BIT & BCS)
+- Manage course content and structure
+- Oversee teacher assignments
+- Monitor student enrollment
 
 ---
 
 ## Programs Supported
 
-The system currently supports 5 programs from the Faculty of Informatics:
-
 | Acronym   | Program Name                                     | Level       | Duration    | Status    |
 | --------- | ------------------------------------------------ | ----------- | ----------- | --------- |
 | **BIT**   | Bachelor Degree in Information Technology        | Bachelor    | 6 semesters | ✅ Active |
 | **BCS**   | Bachelor Degree in Computer Science              | Bachelor    | 6 semesters | ✅ Active |
-| **DIT**   | Ordinary Diploma in Information Technology       | Diploma     | 4 semesters | Setup     |
-| **DCS**   | Ordinary Diploma in Computer Science             | Diploma     | 4 semesters | Setup     |
-| **BTCIT** | Basic Technician Certificate in Computing and IT | Certificate | 2 semesters | Setup     |
+| **DIT**   | Ordinary Diploma in Information Technology       | Diploma     | 4 semesters | Planned   |
+| **DCS**   | Ordinary Diploma in Computer Science             | Diploma     | 4 semesters | Planned   |
+| **BTCIT** | Basic Technician Certificate in Computing and IT | Certificate | 2 semesters | Planned   |
 
 ---
 
@@ -88,8 +78,6 @@ The system currently supports 5 programs from the Faculty of Informatics:
 ---
 
 ## Course Organization Structure
-
-### Category Hierarchy
 
 ```
 BIT (Bachelor in Information Technology)
@@ -124,40 +112,46 @@ Shared Modules
 
 ```
 e-LMS/
-├── moodle/                     # Moodle installation
-│   ├── config.php              # Moodle configuration
+├── moodle/                         # Moodle installation
+│   ├── config.php                  # Moodle configuration
+│   ├── public/                     # Web root (Nginx document root)
 │   └── ...
-├── scripts/                    # Management and utility scripts
-│   ├── System Maintenance
-│   │   ├── system_cleanup.php              # Cache purge, cron, log cleanup
-│   │   └── unenrol_deprecated_courses.php  # Remove deprecated enrollments
+├── scripts/                        # Management and utility scripts
+│   ├── Setup & Configuration
+│   │   ├── run_setup.php                   # Master setup runner
+│   │   ├── setup_moodle.php                # Core Moodle configuration
+│   │   ├── setup_custom_profile_fields.php # Profile fields setup
+│   │   ├── setup_department_hierarchy.php   # Department structure
+│   │   ├── setup_reg_system.php            # Registration system
+│   │   ├── set_recaptcha.php               # reCAPTCHA configuration
+│   │   ├── database_setup.sql              # DB schema
+│   │   └── seed_data.sql                   # Initial data
 │   ├── User Management
-│   │   └── export_users.php                # Export users to CSV
-│   ├── HOD Management
-│   │   ├── analyze_hod_structure.php       # Analyze HOD roles
-│   │   ├── verify_hod_access.php           # Test HOD course access
-│   │   ├── fix_hod_permissions.php         # Grant system-wide access
-│   │   └── remove_redundant_hods.php       # Remove duplicate HODs
-│   ├── Course Organization
-│   │   ├── analyze_shared_categories.php   # Analyze category structure
-│   │   ├── reorganize_shared_courses.php   # Organize courses
-│   │   └── verify_shared_structure.php     # Verify course distribution
-│   ├── Course-Program Links
-│   │   ├── audit_course_program_links.php      # Detailed system audit
-│   │   ├── verify_program_links.php            # Quick health check
-│   │   ├── rebuild_program_course_links.php    # Sync categories ↔ database
-│   │   └── cleanup_program_courses_table.php   # Remove invalid records
-│   ├── Course Creation
+│   │   ├── create_students.php             # Create student accounts
+│   │   ├── create_lecturers.php            # Create facilitator accounts
+│   │   └── create_hod.php                  # Create HOD account
+│   ├── Course Management
 │   │   ├── create_all_courses.php          # Create full course structure
-│   │   └── create_categories.php           # Create category hierarchy
-│   └── Documentation
-│       └── course_management_procedures.md # Complete procedures guide
-├── logs/                       # Server logs
-│   └── archive/                # Archived logs
-├── .env                        # Environment variables
-├── e-LMS_Users_Export.csv      # Latest user export
-├── e-LMS_Users_Reorganized_1.xlsx # User database
-└── README.md                   # This file
+│   │   ├── create_categories.php           # Create category hierarchy
+│   │   └── apply_full_course_template.php  # Apply images & styling
+│   ├── Enrollment
+│   │   ├── enrol_student.php               # Enroll students
+│   │   ├── enrol_hods_in_courses.php       # Enroll HODs
+│   │   ├── cross_enroll_shared.php         # Cross-enroll shared courses
+│   │   └── assign_hod_role.php             # Assign HOD role
+│   ├── Utilities
+│   │   ├── generate_reg_tokens.php         # Generate registration tokens
+│   │   └── run_cron.php                    # Trigger Moodle cron
+│   └── Reference Data
+│       ├── modules_corrected.json          # Course metadata
+│       └── course_management_procedures.md # Procedures guide
+├── images/                         # Course banner images (31 images)
+├── logs/                           # Server logs
+├── .env                            # Environment variables
+├── .env.example                    # Environment template
+├── nginx.conf                      # Nginx configuration
+├── start_server.bat                # Start Nginx + PHP-FPM
+└── README.md                       # This file
 ```
 
 ---
@@ -176,82 +170,40 @@ e-LMS/
 
 All custom tables use the `mdl_custom_` prefix to avoid conflicts with Moodle core.
 
-**CRITICAL:** Categories and database tables must stay synchronized! See `scripts/course_management_procedures.md` for details.
-
 ---
 
-## Starting the Server
+## Getting Started
+
+### 1. Start the Server
 
 ```bash
-# Navigate to project directory
 cd "c:\Users\jtrip\Desktop\Group 07\e-LMS"
-
-# Start Nginx and PHP-FPM
 ./start_server.bat
-
-# Access system
-# URL: http://localhost:8080
 ```
 
----
+Access the system at: **http://localhost:8081**
 
-## Routine Maintenance
+### 2. Login Credentials
 
-### Weekly Tasks
+- **Admin:** See `.env` file
+- **HOD:** `hod_informatics` / [password]
+- **Students:** Self-registration enabled (with reCAPTCHA)
 
-```bash
-# Verify system health
-php scripts/verify_program_links.php
-```
+### 3. Create a Student Account
 
-### Monthly Tasks
+1. Go to http://localhost:8081/login/signup.php
+2. Fill in the registration form
+3. Complete the reCAPTCHA challenge
+4. Confirm your email
+5. Log in
 
-```bash
-# Full system audit
-php scripts/audit_course_program_links.php
+### 4. Add Content (Facilitator)
 
-# System cleanup
-php moodle/admin/cli/purge_caches.php
-php moodle/admin/cli/cron.php
-
-# Export updated user list
-php scripts/export_users.php
-```
-
-### After Major Changes
-
-```bash
-# Rebuild program-course links
-php scripts/rebuild_program_course_links.php
-
-# Verify the rebuild
-php scripts/verify_program_links.php
-```
-
----
-
-## Course Management
-
-### Adding New Courses
-
-**Recommended:** Use the automated script
-
-```bash
-php scripts/create_all_courses.php
-```
-
-**Manual Creation:**
-
-1. Create course via Moodle UI in appropriate category
-2. **IMMEDIATELY** run: `php scripts/rebuild_program_course_links.php`
-
-### Moving Courses
-
-1. Move via Moodle UI
-2. **IMMEDIATELY** run: `php scripts/rebuild_program_course_links.php`
-3. Verify: `php scripts/verify_program_links.php`
-
-**See `scripts/course_management_procedures.md` for complete guidelines.**
+1. Enter the course
+2. Turn editing on
+3. Add File resource → Upload PDF
+4. Add URL resource → Add video link
+5. Add Quiz → Create questions
 
 ---
 
@@ -268,32 +220,54 @@ php scripts/create_all_courses.php
 
 ---
 
-## Quick Start
+## Routine Maintenance
 
-### 1. Access the System
+### Cache Management
 
-Visit: http://localhost:8080
+```bash
+php moodle/admin/cli/purge_caches.php
+```
 
-### 2. Login Credentials
+### Run Cron
 
-- **Admin:** From `.env` file
-- **HOD:** `hod_informatics` / [password]
-- **Students:** Self-registration enabled
+```bash
+php scripts/run_cron.php
+```
 
-### 3. Create a Test Student Account
+### Update Course Images
 
-1. Click "Log in" → "Create new account"
-2. Fill in the registration form
-3. Confirm your email
-4. Log in
+After updating images in the `images/` directory:
 
-### 4. Add Content (Facilitator)
+```bash
+php scripts/apply_full_course_template.php
+```
 
-1. Enter the course
-2. Turn editing on
-3. Add File resource → Upload PDF
-4. Add URL resource → Add video link
-5. Add Quiz → Create questions
+### Reconfigure reCAPTCHA
+
+To update reCAPTCHA keys:
+
+```bash
+php scripts/set_recaptcha.php <site_key> <secret_key>
+```
+
+---
+
+## Course Management
+
+### Adding New Courses
+
+**Recommended:** Use the automated script:
+
+```bash
+php scripts/create_all_courses.php
+```
+
+**Manual Creation:**
+
+1. Create course via Moodle UI in appropriate category
+2. Run cron to sync: `php scripts/run_cron.php`
+
+See `scripts/course_management_procedures.md` for complete guidelines.
 
 ---
 
@@ -304,56 +278,46 @@ Visit: http://localhost:8080
 - Check `.env` file for correct database credentials
 - Verify PostgreSQL is running: `psql -U moodleuser -d moodle`
 
-### HOD Can't See All Courses
+### Server Won't Start
 
-```bash
-# Diagnose the issue
-php scripts/verify_hod_access.php
+- Ensure no other processes are using ports 8081 (Nginx) or 9000 (PHP-FPM)
+- Check `logs/` directory for error details
 
-# Fix permissions
-php scripts/fix_hod_permissions.php
+### Students Can't Register
 
-# Purge caches
-php moodle/admin/cli/purge_caches.php
-```
-
-### Course Shows Wrong Program
-
-```bash
-# Rebuild program links
-php scripts/rebuild_program_course_links.php
-```
+- Verify reCAPTCHA keys are valid: `php scripts/set_recaptcha.php`
+- Check SMTP settings in `.env` for email confirmation
 
 ### System Performance Issues
 
 ```bash
-# Run system cleanup
-php scripts/system_cleanup.php
+php moodle/admin/cli/purge_caches.php
+php scripts/run_cron.php
 ```
 
 ---
 
-## System Optimization History
+## Scripts Reference
 
-### February 14, 2026 - Major Optimization
-
-- ✅ Purged all caches and optimized performance
-- ✅ Exported 45 users to CSV for tracking
-- ✅ Consolidated 3 HODs → 1 unified HOD
-- ✅ Fixed HOD permissions (48% → 100% course access)
-- ✅ Reorganized 25 shared courses into Year/Semester structure
-- ✅ Deleted unnecessary JSON metadata files
-- ✅ Cleaned up deprecated course enrollments
-
-**Result:** System running at peak performance with clean organization.
+| Script                           | Purpose                     | Safe to Run?       |
+| -------------------------------- | --------------------------- | ------------------ |
+| `run_setup.php`                  | Master setup runner         | ⚠️ First-time only |
+| `setup_moodle.php`               | Core config                 | ⚠️ First-time only |
+| `create_all_courses.php`         | Create courses              | ⚠️ Test first      |
+| `create_categories.php`          | Create categories           | ⚠️ Test first      |
+| `create_students.php`            | Create student accounts     | ⚠️ Test first      |
+| `create_lecturers.php`           | Create facilitator accounts | ⚠️ Test first      |
+| `enrol_student.php`              | Enroll students             | ⚠️ Test first      |
+| `apply_full_course_template.php` | Apply images + styling      | ✅ Re-runnable     |
+| `set_recaptcha.php`              | Configure reCAPTCHA         | ✅ Re-runnable     |
+| `generate_reg_tokens.php`        | Generate tokens             | ✅ Re-runnable     |
+| `run_cron.php`                   | Trigger cron                | ✅ Safe            |
 
 ---
 
 ## Documentation
 
-- **Implementation Plan** - See artifacts directory
-- **Course Management Procedures** - `scripts/course_management_procedures.md`
-- **System Walkthrough** - See artifacts directory
+- **Course Management Procedures** — `scripts/course_management_procedures.md`
 - [Official Moodle Documentation](https://docs.moodle.org)
 
 ---
@@ -370,9 +334,3 @@ For technical support or questions:
 ## License
 
 This system is based on Moodle, which is licensed under GPL v3.
-
----
-
-**Last Updated**: February 14, 2026  
-**Version**: 2.0 (Optimized)  
-**System Status**: ✅ Fully Operational
