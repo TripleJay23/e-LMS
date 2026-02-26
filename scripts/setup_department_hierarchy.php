@@ -1,93 +1,195 @@
 #!/usr/bin/env php
 <?php
 /**
- * Setup Department Hierarchy
+ * Setup and normalize hierarchy to:
+ * Faculty of Informatics -> Department of Informatics -> BCS, BIT, COMMON
  *
- * 1. Creates "Department of Informatics" top-level category
- * 2. Moves BCS and BIT categories (and ALL their children) under it
- * 3. Revokes system-wide manager role from hod_informatics
- * 4. Assigns hod_informatics the manager role scoped to Informatics category only
+ * Also aligns custom tables:
+ * - mdl_custom_faculties
+ * - mdl_custom_departments
+ * - mdl_custom_programs (BCS/BIT -> Department of Informatics)
  *
- * Run: php scripts/setup_department_hierarchy.php
+ * Run:
+ *   php scripts/setup_department_hierarchy.php
  */
 
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->dirroot . '/course/lib.php');
-require_once($CFG->libdir  . '/accesslib.php');
+require_once($CFG->libdir . '/accesslib.php');
 
-echo "╔════════════════════════════════════════════════════════╗\n";
-echo "║   Setup Department of Informatics Hierarchy           ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n\n";
+echo "Setup Department Hierarchy\n";
+echo str_repeat("=", 60) . "\n\n";
 
-// ── 1. Create Department of Informatics category ──────────────────────────────
-echo "Step 1: Create Department of Informatics category...\n";
+/**
+ * Ensure a course category exists and has the expected parent.
+ *
+ * @return core_course_category
+ */
+function ensure_course_category(string $name, string $idnumber, int $parentid = 0, string $description = ''): core_course_category
+{
+   global $DB;
 
-$dept_idnum = 'DEPT_INFORMATICS';
-$dept_cat   = $DB->get_record('course_categories', ['idnumber' => $dept_idnum]);
+   $existing = $DB->get_record('course_categories', ['idnumber' => $idnumber]);
+   if (!$existing) {
+      return core_course_category::create((object)[
+         'name' => $name,
+         'idnumber' => $idnumber,
+         'description' => $description,
+         'descriptionformat' => FORMAT_HTML,
+         'parent' => $parentid,
+         'visible' => 1,
+      ]);
+   }
 
-if (!$dept_cat) {
-   $data                    = new stdClass();
-   $data->name              = 'Department of Informatics';
-   $data->idnumber          = $dept_idnum;
-   $data->description       = '<p>Covers Bachelor of Computer Science (BCS) and Bachelor of Information Technology (BIT) programmes.</p>';
-   $data->descriptionformat = FORMAT_HTML;
-   $data->parent            = 0; // Top-level
-   $data->visible           = 1;
-   $dept_cat = core_course_category::create($data);
-   echo "  ✓ Created: Department of Informatics (id={$dept_cat->id})\n";
-} else {
-   echo "  • Already exists (id={$dept_cat->id})\n";
+   $cat = core_course_category::get($existing->id);
+   if ((int)$existing->parent !== $parentid) {
+      $cat->change_parent($parentid);
+   }
+
+   $updates = (object)['id' => $existing->id];
+   $hasupdates = false;
+   if ($existing->name !== $name) {
+      $updates->name = $name;
+      $hasupdates = true;
+   }
+   if ((string)$existing->description !== (string)$description) {
+      $updates->description = $description;
+      $updates->descriptionformat = FORMAT_HTML;
+      $hasupdates = true;
+   }
+   if ($hasupdates) {
+      $DB->update_record('course_categories', $updates);
+   }
+
+   return core_course_category::get($existing->id);
 }
 
-// ── 2. Move BCS and BIT under Informatics ────────────────────────────────────
-echo "\nStep 2: Move BCS and BIT under Department of Informatics...\n";
+echo "Step 1: Ensure Moodle category hierarchy\n";
+echo str_repeat("-", 60) . "\n";
 
-foreach (['BCS', 'BIT'] as $prog_idnum) {
-   $cat = $DB->get_record('course_categories', ['idnumber' => $prog_idnum]);
-   if (!$cat) {
-      echo "  WARN : Category $prog_idnum not found, skipping.\n";
+$facultycat = ensure_course_category(
+   'Faculty of Informatics',
+   'FACULTY_INFORMATICS',
+   0,
+   '<p>Top-level faculty category for Informatics.</p>'
+);
+echo "+ FACULTY_INFORMATICS (ID: {$facultycat->id})\n";
+
+$deptcat = ensure_course_category(
+   'Department of Informatics',
+   'DEPT_INFORMATICS',
+   $facultycat->id,
+   '<p>Department category containing BIT, BCS and Shared modules.</p>'
+);
+echo "+ DEPT_INFORMATICS (ID: {$deptcat->id})\n";
+
+foreach (['BCS', 'BIT', 'COMMON'] as $idnumber) {
+   $category = $DB->get_record('course_categories', ['idnumber' => $idnumber]);
+   if (!$category) {
+      echo "- {$idnumber} not found, skipping move\n";
       continue;
    }
 
-   if ((int)$cat->parent === (int)$dept_cat->id) {
-      echo "  • $prog_idnum already under Informatics\n";
-      continue;
+   if ((int)$category->parent !== (int)$deptcat->id) {
+      core_course_category::get($category->id)->change_parent($deptcat->id);
    }
-
-   // Use Moodle's category API to move (handles path/depth/context updates)
-   $cat_obj = core_course_category::get($cat->id);
-   $cat_obj->change_parent($dept_cat->id);
-   echo "  ✓ Moved $prog_idnum (id={$cat->id}) under Informatics\n";
+   echo "+ {$idnumber} is under DEPT_INFORMATICS\n";
 }
 
-// ── 3. Fix hod_informatics role assignment ────────────────────────────────────
-echo "\nStep 3: Fix hod_informatics role assignment...\n";
+echo "\nStep 2: Align custom faculty/department/program tables\n";
+echo str_repeat("-", 60) . "\n";
+
+$now = time();
+$faculty = $DB->get_record('custom_faculties', ['code' => 'FI']);
+if (!$faculty) {
+   $facultyid = $DB->insert_record('custom_faculties', (object)[
+      'name' => 'Faculty of Informatics',
+      'code' => 'FI',
+      'timecreated' => $now,
+      'timemodified' => $now,
+   ]);
+   $faculty = $DB->get_record('custom_faculties', ['id' => $facultyid], '*', MUST_EXIST);
+}
+if ($faculty->name !== 'Faculty of Informatics') {
+   $faculty->name = 'Faculty of Informatics';
+   $faculty->timemodified = $now;
+   $DB->update_record('custom_faculties', $faculty);
+}
+echo "+ Custom faculty FI ready (ID: {$faculty->id})\n";
+
+$customdept = $DB->get_record_sql(
+   "SELECT *
+      FROM {custom_departments}
+     WHERE code = ? OR name = ?
+  ORDER BY id ASC",
+   ['INF', 'Department of Informatics'],
+   IGNORE_MULTIPLE
+);
+
+if (!$customdept) {
+   $deptid = $DB->insert_record('custom_departments', (object)[
+      'facultyid' => $faculty->id,
+      'name' => 'Department of Informatics',
+      'code' => 'INF',
+      'timecreated' => $now,
+      'timemodified' => $now,
+   ]);
+   $customdept = $DB->get_record('custom_departments', ['id' => $deptid], '*', MUST_EXIST);
+}
+
+$deptupdates = false;
+if ((int)$customdept->facultyid !== (int)$faculty->id) {
+   $customdept->facultyid = $faculty->id;
+   $deptupdates = true;
+}
+if ($customdept->name !== 'Department of Informatics') {
+   $customdept->name = 'Department of Informatics';
+   $deptupdates = true;
+}
+if ((string)$customdept->code !== 'INF') {
+   $customdept->code = 'INF';
+   $deptupdates = true;
+}
+if ($deptupdates) {
+   $customdept->timemodified = $now;
+   $DB->update_record('custom_departments', $customdept);
+}
+echo "+ Custom department INF ready (ID: {$customdept->id})\n";
+
+$programs = $DB->get_records_list('custom_programs', 'acronym', ['BCS', 'BIT']);
+foreach ($programs as $program) {
+   if ((int)$program->departmentid !== (int)$customdept->id) {
+      $program->departmentid = $customdept->id;
+      $program->timemodified = $now;
+      $DB->update_record('custom_programs', $program);
+   }
+   echo "+ Program {$program->acronym} linked to INF department\n";
+}
+
+echo "\nStep 3: Scope hod_informatics manager role to DEPT_INFORMATICS\n";
+echo str_repeat("-", 60) . "\n";
 
 $hod = $DB->get_record('user', ['username' => 'hod_informatics']);
-if (!$hod) {
-   echo "  WARN : hod_informatics user not found.\n";
-} else {
-   $manager_role = $DB->get_record('role', ['shortname' => 'manager']);
-   if (!$manager_role) {
-      echo "  ERROR: 'manager' role not found.\n";
-   } else {
-      // Revoke ALL existing role assignments for this user
-      $existing = $DB->get_records('role_assignments', ['userid' => $hod->id, 'roleid' => $manager_role->id]);
-      foreach ($existing as $ra) {
-         role_unassign($manager_role->id, $hod->id, $ra->contextid);
-         echo "  ✓ Revoked manager role at contextid={$ra->contextid}\n";
-      }
+$managerrole = $DB->get_record('role', ['shortname' => 'manager']);
 
-      // Assign manager role scoped to Department of Informatics category context
-      $dept_context = context_coursecat::instance($dept_cat->id);
-      role_assign($manager_role->id, $hod->id, $dept_context->id);
-      echo "  ✓ Assigned manager role scoped to 'Department of Informatics' category\n";
-      echo "    (contextid={$dept_context->id}, contextlevel=40)\n";
+if (!$hod) {
+   echo "- User hod_informatics not found, skipping role scope update\n";
+} elseif (!$managerrole) {
+   echo "- Manager role not found, skipping role scope update\n";
+} else {
+   $existingassignments = $DB->get_records('role_assignments', [
+      'userid' => $hod->id,
+      'roleid' => $managerrole->id,
+   ]);
+   foreach ($existingassignments as $ra) {
+      role_unassign($managerrole->id, $hod->id, $ra->contextid);
    }
+
+   $deptcontext = context_coursecat::instance($deptcat->id);
+   role_assign($managerrole->id, $hod->id, $deptcontext->id);
+   echo "+ hod_informatics manager role assigned at context {$deptcontext->id}\n";
 }
 
-echo "\n╔════════════════════════════════════════════════════════╗\n";
-echo "║  Done!                                                ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n";
-echo "\n  hod_informatics now manages BCS + BIT but NOT the whole site.\n\n";
+echo "\nDone.\n";
+
