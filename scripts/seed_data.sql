@@ -1,66 +1,98 @@
 -- Seed Data Script for e-LMS
--- Populates institutional structure with Faculty of Informatics and BIT/BCS programs
+-- Target hierarchy:
+-- Faculty of Informatics -> Department of Informatics -> BIT + BCS
 -- Run this after database_setup.sql
 
--- Insert Faculty of Informatics
 INSERT INTO mdl_custom_faculties (name, code, timecreated, timemodified)
 VALUES ('Faculty of Informatics', 'FI', EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
-ON CONFLICT (code) DO NOTHING;
+ON CONFLICT (code) DO UPDATE
+SET
+    name = EXCLUDED.name,
+    timemodified = EXTRACT(EPOCH FROM NOW())::BIGINT;
 
--- Insert departments and programs
 DO $$
 DECLARE
     faculty_id BIGINT;
-    dept_csm_id BIGINT;
-    dept_is_id BIGINT;
+    dept_inf_id BIGINT;
 BEGIN
-    -- Get faculty ID
-    SELECT id INTO faculty_id FROM mdl_custom_faculties WHERE code = 'FI';
-    
+    SELECT id INTO faculty_id
+    FROM mdl_custom_faculties
+    WHERE code = 'FI';
+
     IF faculty_id IS NULL THEN
-        RAISE EXCEPTION 'Faculty not found. Please run database_setup.sql first.';
+        RAISE EXCEPTION 'Faculty FI not found. Run database_setup.sql first.';
     END IF;
-    
-    -- Insert Department of Computer Science and Mathematics
+
     INSERT INTO mdl_custom_departments (facultyid, name, code, timecreated, timemodified)
-    VALUES (faculty_id, 'Department of Computer Science and Mathematics', 'CSM', 
-            EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
-    ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
-    RETURNING id INTO dept_csm_id;
-    
-    -- If already exists, get the ID
-    IF dept_csm_id IS NULL THEN
-        SELECT id INTO dept_csm_id FROM mdl_custom_departments WHERE code = 'CSM';
+    VALUES (
+        faculty_id,
+        'Department of Informatics',
+        'INF',
+        EXTRACT(EPOCH FROM NOW())::BIGINT,
+        EXTRACT(EPOCH FROM NOW())::BIGINT
+    )
+    ON CONFLICT (code) DO UPDATE
+    SET
+        facultyid = EXCLUDED.facultyid,
+        name = EXCLUDED.name,
+        timemodified = EXTRACT(EPOCH FROM NOW())::BIGINT
+    RETURNING id INTO dept_inf_id;
+
+    IF dept_inf_id IS NULL THEN
+        SELECT id INTO dept_inf_id
+        FROM mdl_custom_departments
+        WHERE code = 'INF';
     END IF;
-    
-    -- Insert Department of Information Systems
-    INSERT INTO mdl_custom_departments (facultyid, name, code, timecreated, timemodified)
-    VALUES (faculty_id, 'Department of Information Systems', 'IS', 
-            EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
-    ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
-    RETURNING id INTO dept_is_id;
-    
-    -- If already exists, get the ID
-    IF dept_is_id IS NULL THEN
-        SELECT id INTO dept_is_id FROM mdl_custom_departments WHERE code = 'IS';
+
+    IF NOT EXISTS (SELECT 1 FROM mdl_custom_programs WHERE acronym = 'BCS') THEN
+        INSERT INTO mdl_custom_programs (
+            departmentid, name, acronym, level, duration, timecreated, timemodified
+        ) VALUES (
+            dept_inf_id,
+            'Bachelor Degree in Computer Science',
+            'BCS',
+            'bachelor',
+            6,
+            EXTRACT(EPOCH FROM NOW())::BIGINT,
+            EXTRACT(EPOCH FROM NOW())::BIGINT
+        );
+    ELSE
+        UPDATE mdl_custom_programs
+        SET
+            departmentid = dept_inf_id,
+            name = 'Bachelor Degree in Computer Science',
+            level = 'bachelor',
+            duration = 6,
+            timemodified = EXTRACT(EPOCH FROM NOW())::BIGINT
+        WHERE acronym = 'BCS';
     END IF;
-    
-    -- Insert Programs for Computer Science and Mathematics
-    INSERT INTO mdl_custom_programs (departmentid, name, acronym, level, duration, timecreated, timemodified)
-    VALUES 
-        (dept_csm_id, 'Bachelor Degree in Computer Science', 'BCS', 'bachelor', 6, 
-         EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
-    ON CONFLICT DO NOTHING;
-    
-    -- Insert Programs for Information Systems
-    INSERT INTO mdl_custom_programs (departmentid, name, acronym, level, duration, timecreated, timemodified)
-    VALUES 
-        (dept_is_id, 'Bachelor Degree in Information Technology', 'BIT', 'bachelor', 6, 
-         EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
-    ON CONFLICT DO NOTHING;
-    
-    RAISE NOTICE 'Seed data inserted successfully!';
+
+    IF NOT EXISTS (SELECT 1 FROM mdl_custom_programs WHERE acronym = 'BIT') THEN
+        INSERT INTO mdl_custom_programs (
+            departmentid, name, acronym, level, duration, timecreated, timemodified
+        ) VALUES (
+            dept_inf_id,
+            'Bachelor Degree in Information Technology',
+            'BIT',
+            'bachelor',
+            6,
+            EXTRACT(EPOCH FROM NOW())::BIGINT,
+            EXTRACT(EPOCH FROM NOW())::BIGINT
+        );
+    ELSE
+        UPDATE mdl_custom_programs
+        SET
+            departmentid = dept_inf_id,
+            name = 'Bachelor Degree in Information Technology',
+            level = 'bachelor',
+            duration = 6,
+            timemodified = EXTRACT(EPOCH FROM NOW())::BIGINT
+        WHERE acronym = 'BIT';
+    END IF;
+
+    RAISE NOTICE 'Seed data aligned successfully.';
     RAISE NOTICE 'Faculty: Faculty of Informatics';
-    RAISE NOTICE 'Departments: Computer Science and Mathematics, Information Systems';
-    RAISE NOTICE 'Programs: DCS, BCS, BTCIT, DIT, BIT (5 programs total)';
+    RAISE NOTICE 'Department: Department of Informatics';
+    RAISE NOTICE 'Programs: BCS, BIT';
 END $$;
+

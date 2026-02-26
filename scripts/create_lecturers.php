@@ -1,8 +1,12 @@
 #!/usr/bin/env php
 <?php
 /**
- * Generate Lecturers and Assign to Courses
- * Creates lecturer accounts and enrolls them in courses
+ * Generate lecturers and assign exactly one lecturer per course.
+ *
+ * Idempotent behavior:
+ * - Creates missing lecturer users.
+ * - Distributes courses in a deterministic round-robin order.
+ * - Ensures one editingteacher role per course (target lecturer).
  */
 
 define('CLI_SCRIPT', true);
@@ -10,38 +14,35 @@ require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->libdir . '/authlib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->libdir . '/enrollib.php');
+require_once($CFG->libdir . '/accesslib.php');
 
-echo "╔════════════════════════════════════════════════════════╗\n";
-echo "║      Lecturer Generation and Assignment               ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n\n";
+echo "Lecturer Generation and Assignment\n";
+echo str_repeat("=", 60) . "\n\n";
 
-// Generate lecturer data
 $lecturers = [
-   ['username' => 'dr_mwangi', 'firstname' => 'Dr. James', 'lastname' => 'Mwangi', 'email' => 'james.mwangi@example.com'],
-   ['username' => 'prof_njoroge', 'firstname' => 'Prof. Grace', 'lastname' => 'Njoroge', 'email' => 'grace.njoroge@example.com'],
-   ['username' => 'dr_kamau', 'firstname' => 'Dr. Peter', 'lastname' => 'Kamau', 'email' => 'peter.kamau@example.com'],
-   ['username' => 'ms_otieno', 'firstname' => 'Ms. Sarah', 'lastname' => 'Otieno', 'email' => 'sarah.otieno@example.com'],
-   ['username' => 'mr_odhiambo', 'firstname' => 'Mr. David', 'lastname' => 'Odhiambo', 'email' => 'david.odhiambo@example.com'],
-   ['username' => 'dr_wanjiru', 'firstname' => 'Dr. Mary', 'lastname' => 'Wanjiru', 'email' => 'mary.wanjiru@example.com'],
-   ['username' => 'prof_kimani', 'firstname' => 'Prof. John', 'lastname' => 'Kimani', 'email' => 'john.kimani@example.com'],
-   ['username' => 'dr_achieng', 'firstname' => 'Dr. Jane', 'lastname' => 'Achieng', 'email' => 'jane.achieng@example.com'],
+   ['username' => 'dr_mwangi',    'firstname' => 'Dr. James',  'lastname' => 'Mwangi',   'email' => 'james.mwangi@example.com'],
+   ['username' => 'prof_njoroge', 'firstname' => 'Prof. Grace','lastname' => 'Njoroge',  'email' => 'grace.njoroge@example.com'],
+   ['username' => 'dr_kamau',     'firstname' => 'Dr. Peter',  'lastname' => 'Kamau',    'email' => 'peter.kamau@example.com'],
+   ['username' => 'ms_otieno',    'firstname' => 'Ms. Sarah',  'lastname' => 'Otieno',   'email' => 'sarah.otieno@example.com'],
+   ['username' => 'mr_odhiambo',  'firstname' => 'Mr. David',  'lastname' => 'Odhiambo', 'email' => 'david.odhiambo@example.com'],
+   ['username' => 'dr_wanjiru',   'firstname' => 'Dr. Mary',   'lastname' => 'Wanjiru',  'email' => 'mary.wanjiru@example.com'],
+   ['username' => 'prof_kimani',  'firstname' => 'Prof. John', 'lastname' => 'Kimani',   'email' => 'john.kimani@example.com'],
+   ['username' => 'dr_achieng',   'firstname' => 'Dr. Jane',   'lastname' => 'Achieng',  'email' => 'jane.achieng@example.com'],
 ];
 
 $password = 'Lecturer@2026';
 $created = 0;
 
-echo "Step 1: Creating Lecturer Accounts\n";
+echo "Step 1: Creating lecturer accounts\n";
 echo str_repeat("-", 60) . "\n";
 
 foreach ($lecturers as $lec) {
    $existing = $DB->get_record('user', ['username' => $lec['username']]);
-
    if ($existing) {
-      echo "• {$lec['username']}: {$lec['firstname']} {$lec['lastname']} (exists)\n";
+      echo "- {$lec['username']} (exists)\n";
       continue;
    }
 
-   // Create user
    $user = create_user_record($lec['username'], $password, 'manual');
    $user->firstname = $lec['firstname'];
    $user->lastname = $lec['lastname'];
@@ -50,74 +51,123 @@ foreach ($lecturers as $lec) {
    $user->country = 'TZ';
    $user->confirmed = 1;
    $user->mnethostid = $CFG->mnet_localhost_id;
-
    $DB->update_record('user', $user);
-   echo "✓ {$lec['username']}: {$lec['firstname']} {$lec['lastname']}\n";
+
+   echo "+ {$lec['username']} created\n";
    $created++;
 }
 
-echo "\nCreated $created new lecturers\n";
-echo "Password for all lecturers: $password\n\n";
+echo "\nCreated {$created} new lecturer(s)\n";
+echo "Default lecturer password: {$password}\n\n";
 
-// Step 2: Assign lecturers to courses
-echo "Step 2: Assigning Lecturers to Courses\n";
+echo "Step 2: Assigning one lecturer per course\n";
 echo str_repeat("-", 60) . "\n";
 
-// Get all courses (excluding site course)
-$courses = $DB->get_records_select('course', 'id > 1', null, 'shortname');
-$teacher_role = $DB->get_record('role', ['shortname' => 'editingteacher']);
-
-// Distribute courses among lecturers
-$lecturer_users = $DB->get_records_sql("SELECT * FROM {user} WHERE username LIKE 'dr_%' OR username LIKE 'prof_%' OR username LIKE 'ms_%' OR username LIKE 'mr_%'");
-$lecturer_array = array_values($lecturer_users);
-$lecturer_count = count($lecturer_array);
-
-if ($lecturer_count == 0) {
-   echo "Error: No lecturers found\n";
+$teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher'], '*', MUST_EXIST);
+$manualenrol = enrol_get_plugin('manual');
+if (!$manualenrol) {
+   echo "ERROR: manual enrolment plugin is not available.\n";
    exit(1);
 }
 
-$course_index = 0;
-$enrollments = 0;
+$usernames = array_map(static function ($l) {
+   return $l['username'];
+}, $lecturers);
+
+$lecturerusers = $DB->get_records_list('user', 'username', $usernames, 'username ASC');
+$lecturerarray = array_values($lecturerusers);
+$lecturercount = count($lecturerarray);
+
+if ($lecturercount === 0) {
+   echo "ERROR: no managed lecturers found.\n";
+   exit(1);
+}
+
+$courses = $DB->get_records_select('course', 'id > 1', null, 'shortname ASC', 'id,shortname,fullname');
+$courseindex = 0;
+$newassignments = 0;
+$removedroles = 0;
+$unenrolments = 0;
 
 foreach ($courses as $course) {
-   // Assign lecturer (round-robin)
-   $lecturer = $lecturer_array[$course_index % $lecturer_count];
+   $target = $lecturerarray[$courseindex % $lecturercount];
+   $coursecontext = context_course::instance($course->id);
 
-   // Check if manual enrolment exists
-   $enrol_instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
-   if (!$enrol_instance) {
-      $enrol = enrol_get_plugin('manual');
-      $enrol->add_default_instance($course);
-      $enrol_instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
+   $manualinstance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
+   if (!$manualinstance) {
+      $manualenrol->add_default_instance($course);
+      $manualinstance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual'], '*', MUST_EXIST);
    }
 
-   // Check if already enrolled
-   $already_enrolled = $DB->record_exists('user_enrolments', [
-      'enrolid' => $enrol_instance->id,
-      'userid' => $lecturer->id
-   ]);
+   $assignments = $DB->get_records_sql(
+      "SELECT ra.id, ra.userid
+         FROM {role_assignments} ra
+         JOIN {context} ctx ON ctx.id = ra.contextid
+        WHERE ra.roleid = ?
+          AND ctx.contextlevel = ?
+          AND ctx.instanceid = ?",
+      [$teacherrole->id, CONTEXT_COURSE, $course->id]
+   );
 
-   if (!$already_enrolled) {
-      $enrol = enrol_get_plugin('manual');
-      $enrol->enrol_user($enrol_instance, $lecturer->id, $teacher_role->id);
-      echo "✓ {$course->shortname}: {$lecturer->firstname} {$lecturer->lastname}\n";
-      $enrollments++;
+   foreach ($assignments as $assignment) {
+      if ((int)$assignment->userid === (int)$target->id) {
+         continue;
+      }
+
+      role_unassign($teacherrole->id, $assignment->userid, $coursecontext->id);
+      $removedroles++;
+
+      $stillhasroles = $DB->count_records_sql(
+         "SELECT COUNT(1)
+            FROM {role_assignments} ra
+            JOIN {context} ctx ON ctx.id = ra.contextid
+           WHERE ra.userid = ?
+             AND ctx.contextlevel = ?
+             AND ctx.instanceid = ?",
+         [$assignment->userid, CONTEXT_COURSE, $course->id]
+      );
+
+      if ($stillhasroles > 0) {
+         continue;
+      }
+
+      $instances = enrol_get_instances($course->id, true);
+      foreach ($instances as $instance) {
+         if (!$DB->record_exists('user_enrolments', ['enrolid' => $instance->id, 'userid' => $assignment->userid])) {
+            continue;
+         }
+
+         $plugin = enrol_get_plugin($instance->enrol);
+         if ($plugin) {
+            $plugin->unenrol_user($instance, $assignment->userid);
+            $unenrolments++;
+         }
+      }
    }
 
-   $course_index++;
+   $hastargetassignment = user_has_role_assignment($target->id, $teacherrole->id, $coursecontext->id);
+   if (!$hastargetassignment) {
+      $manualenrol->enrol_user($manualinstance, $target->id, $teacherrole->id);
+      $newassignments++;
+   } elseif (!$DB->record_exists('user_enrolments', ['enrolid' => $manualinstance->id, 'userid' => $target->id])) {
+      $manualenrol->enrol_user($manualinstance, $target->id, $teacherrole->id);
+      $newassignments++;
+   }
+
+   echo "+ {$course->shortname} -> {$target->username}\n";
+   $courseindex++;
 }
 
-echo "\n╔════════════════════════════════════════════════════════╗\n";
-echo "║         Lecturer Assignment Complete! ✓               ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n\n";
+echo "\nSummary\n";
+echo "  Lecturers created: {$created}\n";
+echo "  New teacher assignments: {$newassignments}\n";
+echo "  Extra teacher roles removed: {$removedroles}\n";
+echo "  Extra enrolments removed: {$unenrolments}\n";
+echo "  Courses processed: " . count($courses) . "\n";
+echo "  Target courses per lecturer: ~" . round(count($courses) / $lecturercount, 1) . "\n\n";
 
-echo "Summary:\n";
-echo "  • Lecturers created: $created\n";
-echo "  • Course enrollments: $enrollments\n";
-echo "  • Courses per lecturer: ~" . round(count($courses) / $lecturer_count, 1) . "\n\n";
-
-echo "Lecturer credentials:\n";
-foreach ($lecturer_users as $lec) {
-   echo "  - {$lec->username} / $password\n";
+echo "Lecturer credentials\n";
+foreach ($lecturerarray as $lecturer) {
+   echo "  - {$lecturer->username} / {$password}\n";
 }
+

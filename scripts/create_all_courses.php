@@ -3,7 +3,7 @@
 /**
  * Create Complete Course Structure for BIT and BCS
  * - Creates category hierarchy (Year → Semester)
- * - Creates shared courses as DUPLICATE instances in each program
+ * - Creates shared courses as centralized instances under COMMON
  * - Creates program-specific courses
  */
 
@@ -24,7 +24,7 @@ $bit_only = $data['bit_only'];
 $bcs_only = $data['bcs_only'];
 
 echo "Modules to create:\n";
-echo "  • Shared: " . count($shared_modules) . " (Will be duplicated for BIT & BCS)\n";
+echo "  • Shared: " . count($shared_modules) . " (Centralized, linked to BIT & BCS)\n";
 echo "  • BIT-only: " . count($bit_only) . "\n";
 echo "  • BCS-only: " . count($bcs_only) . "\n\n";
 
@@ -253,4 +253,4 @@ echo "║         Course Structure Complete! ✓                  ║\n";
 echo "╚════════════════════════════════════════════════════════╝\n\n";
 
 echo "Summary:\n";
-echo "  • Total new courses: " . ($created_shared_bit + $created_shared_bcs + $created_bit + $created_bcs) . "\n\n";
+echo "  • Total new courses: " . ($created_shared + $created_bit + $created_bcs) . "\n\n";

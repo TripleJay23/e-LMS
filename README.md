@@ -16,7 +16,7 @@ A Moodle-based e-Learning Management System customized for the Faculty of Inform
 
 - **Students:** 6
 - **Facilitators (Teachers):** 7
-- **HOD (Manager):** 1 — `hod_informatics` (system-wide access)
+- **HOD (Manager):** 1 � `hod_informatics` (department-level access)
 - **Admin:** 1
 
 ### Courses
@@ -80,30 +80,20 @@ A Moodle-based e-Learning Management System customized for the Faculty of Inform
 ## Course Organization Structure
 
 ```
-BIT (Bachelor in Information Technology)
-├── Year 1
-│   ├── Semester 1
-│   └── Semester 2
-├── Year 2
-│   ├── Semester 1
-│   └── Semester 2
-└── Year 3
-    ├── Semester 1
-    └── Semester 2
-
-BCS (Bachelor in Computer Science)
-└── [Same structure as BIT]
-
-Shared Modules
-├── Year 1
-│   ├── Semester 1
-│   └── Semester 2
-├── Year 2
-│   ├── Semester 1
-│   └── Semester 2
-└── Year 3
-    ├── Semester 1
-    └── Semester 2
+Faculty of Informatics (FACULTY_INFORMATICS)
+`-- Department of Informatics (DEPT_INFORMATICS)
+    |-- BCS
+    |   |-- Year 1 -> Semester 1/2
+    |   |-- Year 2 -> Semester 1/2
+    |   `-- Year 3 -> Semester 1/2
+    |-- BIT
+    |   |-- Year 1 -> Semester 1/2
+    |   |-- Year 2 -> Semester 1/2
+    |   `-- Year 3 -> Semester 1/2
+    `-- Shared Modules (COMMON)
+        |-- Year 1 -> Semester 1/2
+        |-- Year 2 -> Semester 1/2
+        `-- Year 3 -> Semester 1/2
 ```
 
 ---
@@ -216,7 +206,7 @@ Access the system at: **http://localhost:8081**
 | Facilitator | [various]       | `editingteacher` | Upload content, create quizzes, grade assignments |
 | Student     | [various]       | `student`        | View content, take quizzes, submit assignments    |
 
-**Note:** There is **one unified HOD** (`hod_informatics`) with system-wide access to both programs.
+**Note:** There is **one unified HOD** (`hod_informatics`) with department-scoped manager access over BIT, BCS, and shared courses.
 
 ---
 
@@ -334,3 +324,4 @@ For technical support or questions:
 ## License
 
 This system is based on Moodle, which is licensed under GPL v3.
+

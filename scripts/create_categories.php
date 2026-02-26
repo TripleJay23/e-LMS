@@ -1,125 +1,143 @@
 #!/usr/bin/env php
 <?php
 /**
- * Create Course Categories for e-LMS Programs
- * Creates Moodle course categories for each program (BIT, BCS, DCS, DIT, BTCIT)
+ * Create and normalize course categories for e-LMS.
+ *
+ * Target hierarchy:
+ * Faculty of Informatics
+ *   -> Department of Informatics
+ *      -> BCS
+ *      -> BIT
+ *      -> Shared Modules
  */
 
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 
-echo "╔════════════════════════════════════════════════════════╗\n";
-echo "║        e-LMS Course Categories Setup                  ║\n";
-echo "╚════════════════════════════════════════════════════════╝\n\n";
+echo "e-LMS Course Categories Setup\n";
+echo str_repeat("=", 60) . "\n\n";
 
-echo "Creating course categories for programs...\n\n";
+/**
+ * Ensure category exists with expected parent/name/description.
+ *
+ * @return core_course_category
+ */
+function ensure_category(string $name, string $idnumber, int $parentid = 0, string $description = ''): core_course_category
+{
+   global $DB;
+
+   $existing = $DB->get_record('course_categories', ['idnumber' => $idnumber]);
+   if (!$existing) {
+      $data = (object)[
+         'name' => $name,
+         'idnumber' => $idnumber,
+         'description' => $description,
+         'descriptionformat' => FORMAT_HTML,
+         'parent' => $parentid,
+         'visible' => 1,
+      ];
+      return core_course_category::create($data);
+   }
+
+   $cat = core_course_category::get($existing->id);
+   $updates = (object)['id' => $existing->id];
+   $hasupdates = false;
+
+   if ((int)$existing->parent !== $parentid) {
+      $cat->change_parent($parentid);
+   }
+
+   if ($existing->name !== $name) {
+      $updates->name = $name;
+      $hasupdates = true;
+   }
+   if ((string)$existing->description !== (string)$description) {
+      $updates->description = $description;
+      $updates->descriptionformat = FORMAT_HTML;
+      $hasupdates = true;
+   }
+
+   if ($hasupdates) {
+      $DB->update_record('course_categories', $updates);
+   }
+
+   return core_course_category::get($existing->id);
+}
 
 try {
-   // Get all programs from database
-   $programs = $DB->get_records_sql("
-        SELECT p.*, d.name as department_name
-        FROM {custom_programs} p
-        JOIN {custom_departments} d ON p.departmentid = d.id
-        ORDER BY p.acronym
-    ");
+   echo "Step 1: Ensuring Faculty and Department categories\n";
+   echo str_repeat("-", 60) . "\n";
 
-   $categoryCount = 0;
+   $faculty = ensure_category(
+      'Faculty of Informatics',
+      'FACULTY_INFORMATICS',
+      0,
+      '<p>Top-level academic unit for Informatics programs.</p>'
+   );
+   echo "+ FACULTY_INFORMATICS (ID: {$faculty->id})\n";
+
+   $department = ensure_category(
+      'Department of Informatics',
+      'DEPT_INFORMATICS',
+      $faculty->id,
+      '<p>Department offering BIT, BCS and shared Informatics courses.</p>'
+   );
+   echo "+ DEPT_INFORMATICS (ID: {$department->id})\n\n";
+
+   echo "Step 2: Ensuring program categories under Department\n";
+   echo str_repeat("-", 60) . "\n";
+
+   $programs = $DB->get_records_sql(
+      "SELECT p.*, d.name AS department_name
+         FROM {custom_programs} p
+         JOIN {custom_departments} d ON p.departmentid = d.id
+        ORDER BY p.acronym"
+   );
 
    foreach ($programs as $program) {
-      // Check if category already exists
-      $existing = $DB->get_record('course_categories', ['idnumber' => $program->acronym]);
+      $description = "<p><strong>Level:</strong> " . ucfirst((string)$program->level) . "</p>"
+         . "<p><strong>Department:</strong> {$program->department_name}</p>"
+         . "<p><strong>Duration:</strong> {$program->duration} semesters</p>";
 
-      if ($existing) {
-         echo "• {$program->acronym} - Already exists (ID: {$existing->id})\n";
-         continue;
-      }
+      $cat = ensure_category(
+         $program->name,
+         (string)$program->acronym,
+         $department->id,
+         $description
+      );
 
-      // Create new course category
-      $categoryData = new stdClass();
-      $categoryData->name = $program->name;
-      $categoryData->idnumber = $program->acronym;
-      $categoryData->description = "<p><strong>Level:</strong> " . ucfirst($program->level) . "</p>" .
-         "<p><strong>Department:</strong> {$program->department_name}</p>" .
-         "<p><strong>Duration:</strong> {$program->duration} semesters</p>";
-      $categoryData->descriptionformat = FORMAT_HTML;
-      $categoryData->parent = 0; // Top-level category
-      $categoryData->visible = 1;
-
-      $category = core_course_category::create($categoryData);
-      $categoryCount++;
-
-      echo "✓ Created: {$program->acronym} - {$program->name} (ID: {$category->id})\n";
+      echo "+ {$program->acronym} (ID: {$cat->id})\n";
    }
 
-   echo "\n╔════════════════════════════════════════════════════════╗\n";
-   echo "║         Categories Created! ✓                          ║\n";
-   echo "╚════════════════════════════════════════════════════════╝\n\n";
+   echo "\nStep 3: Ensuring Shared Modules hierarchy\n";
+   echo str_repeat("-", 60) . "\n";
 
-   echo "Summary:\n";
-   echo "  • Total programs: " . count($programs) . "\n";
-   echo "  • New categories created: $categoryCount\n\n";
+   $shared = ensure_category(
+      'Shared Modules',
+      'COMMON',
+      $department->id,
+      '<p>Courses shared by BIT and BCS programs.</p>'
+   );
+   echo "+ COMMON (ID: {$shared->id})\n";
 
-
-   // ── Create Shared Modules Hierarchy ────────────────────────────────────────
-   echo "\nCreating Shared Modules hierarchy...\n";
-   $shared_idnum = 'COMMON'; // As used in create_hod.php
-   $shared_cat_record = $DB->get_record('course_categories', ['idnumber' => $shared_idnum]);
-
-   if (!$shared_cat_record) {
-      $sharedData = new stdClass();
-      $sharedData->name = 'Shared Modules';
-      $sharedData->idnumber = $shared_idnum;
-      $sharedData->description = 'Courses shared across multiple programs (BIT, BCS, etc.)';
-      $sharedData->parent = 0;
-      $sharedData->visible = 1;
-      $shared_cat = core_course_category::create($sharedData);
-      echo "✓ Created: Shared Modules (ID: {$shared_cat->id})\n";
-   } else {
-      $shared_cat = core_course_category::get($shared_cat_record->id);
-      echo "• Shared Modules already exists (ID: {$shared_cat->id})\n";
-   }
-
-   // Create Year/Semester subcategories for Shared Modules
    for ($year = 1; $year <= 3; $year++) {
-      $year_idnum = "common_y{$year}";
-      $year_cat_record = $DB->get_record('course_categories', ['idnumber' => $year_idnum]);
-
-      if (!$year_cat_record) {
-         $year_cat = core_course_category::create([
-            'name' => "Year $year",
-            'idnumber' => $year_idnum,
-            'parent' => $shared_cat->id,
-            'visible' => 1
-         ]);
-         echo "  ✓ Shared Year $year (ID: {$year_cat->id})\n";
-      } else {
-         $year_cat = core_course_category::get($year_cat_record->id);
-         echo "  • Shared Year $year exists (ID: {$year_cat->id})\n";
-      }
+      $yearidnum = "common_y{$year}";
+      $yearcat = ensure_category("Year {$year}", $yearidnum, $shared->id);
+      echo "  + {$yearidnum} (ID: {$yearcat->id})\n";
 
       for ($sem = 1; $sem <= 2; $sem++) {
-         $sem_idnum = "common_y{$year}_s{$sem}";
-         if (!$DB->record_exists('course_categories', ['idnumber' => $sem_idnum])) {
-            $sem_cat = core_course_category::create([
-               'name' => "Semester $sem",
-               'idnumber' => $sem_idnum,
-               'parent' => $year_cat->id,
-               'visible' => 1
-            ]);
-            echo "    ✓ Shared Semester $sem (ID: {$sem_cat->id})\n";
-         } else {
-            echo "    • Shared Semester $sem exists\n";
-         }
+         $semidnum = "common_y{$year}_s{$sem}";
+         $semcat = ensure_category("Semester {$sem}", $semidnum, $yearcat->id);
+         echo "    + {$semidnum} (ID: {$semcat->id})\n";
       }
    }
 
-   echo "\nNext steps:\n";
-   echo "  1. Create courses within these categories\n";
-   echo "  2. Assign facilitators to courses\n";
-   echo "  3. Add course content (PDFs, videos, quizzes)\n\n";
+   echo "\nDone.\n";
+   echo "Hierarchy target is now enforced in an idempotent way.\n";
 } catch (Exception $e) {
-   echo "✗ Error: " . $e->getMessage() . "\n";
+   echo "ERROR: {$e->getMessage()}\n";
    echo $e->getTraceAsString() . "\n";
    exit(1);
 }
+

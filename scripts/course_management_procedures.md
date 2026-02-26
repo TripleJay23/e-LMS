@@ -2,205 +2,79 @@
 
 ## Overview
 
-The e-LMS uses two parallel systems for organizing courses:
+The e-LMS uses two synchronized structures:
 
-1. **Moodle Course Categories** — Visual hierarchy visible to users
-2. **Custom Database Tables** — Links courses to programs for enrollment and reporting
+1. Moodle course categories (visible hierarchy).
+2. Custom DB tables (`mdl_custom_*`) for program relationships.
 
-**CRITICAL**: These systems must stay synchronized at all times!
-
----
-
-## Course Organization Structure
-
-### Category Hierarchy
+## Target Hierarchy
 
 ```
-BIT (idnumber: BIT)
-├── Year 1 (idnumber: BIT_Y1)
-│   ├── Semester 1 (idnumber: BIT_Y1_S1)
-│   └── Semester 2 (idnumber: BIT_Y1_S2)
-├── Year 2 (idnumber: BIT_Y2)
-│   ├── Semester 1 (idnumber: BIT_Y2_S1)
-│   └── Semester 2 (idnumber: BIT_Y2_S2)
-└── Year 3 (idnumber: BIT_Y3)
-    ├── Semester 1 (idnumber: BIT_Y3_S1)
-    └── Semester 2 (idnumber: BIT_Y3_S2)
-
-BCS (idnumber: BCS)
-└── [Same structure as BIT]
+Faculty of Informatics (idnumber: FACULTY_INFORMATICS)
+`-- Department of Informatics (idnumber: DEPT_INFORMATICS)
+    |-- BCS (idnumber: BCS)
+    |   |-- Year 1 (BCS_Y1)
+    |   |   |-- Semester 1 (BCS_Y1_S1)
+    |   |   `-- Semester 2 (BCS_Y1_S2)
+    |   |-- Year 2 (BCS_Y2)
+    |   `-- Year 3 (BCS_Y3)
+    |-- BIT (idnumber: BIT)
+    |   |-- Year 1 (BIT_Y1)
+    |   |-- Year 2 (BIT_Y2)
+    |   `-- Year 3 (BIT_Y3)
+    `-- Shared Modules (idnumber: COMMON)
+        |-- Year 1 (common_y1)
+        |   |-- Semester 1 (common_y1_s1)
+        |   `-- Semester 2 (common_y1_s2)
+        |-- Year 2 (common_y2)
+        `-- Year 3 (common_y3)
 ```
 
-### Database Tables
+## Required Setup Order
 
-- `mdl_custom_programs` — Program definitions (BIT, BCS, etc.)
-- `mdl_custom_program_courses` — Links courses to programs
-- `mdl_custom_student_programs` — Student enrollment in programs
-
----
-
-## Adding New Courses
-
-### ✅ Recommended: Automated Script
-
-```bash
-php scripts/create_all_courses.php
-```
-
-This script:
-
-- Creates courses in correct categories
-- Automatically adds records to `mdl_custom_program_courses`
-- Ensures synchronization from the start
-
-### ⚠️ Manual Creation (Discouraged)
-
-If you MUST create a course manually via Moodle UI:
-
-1. Create the course in the appropriate category (`BIT_Y1_S1`, etc.)
-2. Run cron to sync: `php scripts/run_cron.php`
-
----
+1. `php scripts/create_categories.php`
+2. `php scripts/setup_department_hierarchy.php`
+3. `php scripts/create_all_courses.php`
+4. `php scripts/create_lecturers.php`
 
 ## Shared Courses
 
-Shared courses (e.g., Mathematics, Programming Fundamentals) are created as **separate instances**:
+Shared courses are centralized as one course instance per code:
 
-- `ITU 07101-BIT` — BIT version
-- `ITU 07101-BCS` — BCS version
+- Example: `ITU 07101-SHARED`
+- Category location: `COMMON -> common_yX_sY`
+- Program links: both BIT and BCS in `mdl_custom_program_courses`
 
-### Why Separate Instances?
+## Teacher Assignment Rule
 
-- Each program can have different schedules
-- Different lecturers for each program
-- Different student cohorts
-- Independent grading and assessments
-
-### Creating Shared Courses
-
-The `create_all_courses.php` script handles this automatically by:
-
-- Reading from `modules_corrected.json`
-- Creating both BIT and BCS versions
-- Linking each to its respective program
-
----
-
-## Course Images & Styling
-
-### Updating Course Images
-
-1. Place new images in the `images/` directory (JPG, PNG, GIF supported)
-2. Run the template script:
-
-```bash
-php scripts/apply_full_course_template.php
-```
-
-This will:
-
-- Upload images to each course (round-robin distribution)
-- Generate styled summary HTML with academic metadata (year, semester, credits, type)
-- Pull metadata from `modules_corrected.json`
-
----
-
-## Deprecating/Archiving Courses
-
-### Naming Convention
-
-Before archiving, rename courses to indicate they're deprecated:
-
-- Add `-OLD` suffix: `ITU 07101-OLD`
-- Add `(DEPRECATED)` to fullname
-
-### How to Archive
-
-1. Hide the course via Moodle UI (Course settings → Visibility: Hide)
-2. Move to an "Archive" category if desired
-
-### Deleting Courses (Permanent)
-
-**⚠️ WARNING**: Deletion is permanent and cannot be undone!
-
-1. Ensure all student data is exported
-2. Archive the course first
-3. Use Moodle's built-in deletion:
-   - Site administration → Courses → Manage courses and categories
-   - Select course → Delete
-
----
+`scripts/create_lecturers.php` is idempotent and enforces exactly one `editingteacher` per course to keep single-teacher course cards on the home page.
 
 ## Best Practices
 
-### ✅ DO
+- Use scripts, not manual bulk changes in UI.
+- Keep `idnumber` values unchanged.
+- Purge caches after hierarchy/theme/server changes:
 
-- Use automated scripts for course creation
-- Keep categories organized with proper idnumbers
-- Archive old courses instead of deleting
-- Keep database backups
-- Update course images regularly via `apply_full_course_template.php`
+```bash
+php moodle/admin/cli/purge_caches.php
+```
 
-### ❌ DON'T
+- Keep backups before destructive changes:
 
-- Create courses manually without running cron after
-- Delete courses without archiving first
-- Modify `mdl_custom_program_courses` directly in SQL
-- Make bulk changes without backups
-
----
-
-## Emergency Recovery
-
-If the system becomes out of sync:
-
-1. **Backup database immediately**
-
-   ```bash
-   pg_dump -h localhost -U moodleuser -d moodle > emergency_backup.sql
-   ```
-
-2. **Purge caches**
-
-   ```bash
-   php moodle/admin/cli/purge_caches.php
-   ```
-
-3. **Run cron**
-
-   ```bash
-   php scripts/run_cron.php
-   ```
-
-4. **Test critical functions**
-   - Check HOD views
-   - Check student enrollments
-   - Check course listings
-
----
+```bash
+pg_dump -h localhost -U moodleuser -d moodle > backup.sql
+```
 
 ## Script Reference
 
-| Script                           | Purpose                      | Safe to Run?   |
-| -------------------------------- | ---------------------------- | -------------- |
-| `create_all_courses.php`         | Create full course structure | ⚠️ Test first  |
-| `create_categories.php`          | Create category hierarchy    | ⚠️ Test first  |
-| `apply_full_course_template.php` | Apply images & styling       | ✅ Re-runnable |
-| `enrol_student.php`              | Enroll students              | ⚠️ Test first  |
-| `enrol_hods_in_courses.php`      | Enroll HODs                  | ⚠️ Test first  |
-| `cross_enroll_shared.php`        | Shared course enrollment     | ⚠️ Test first  |
-| `run_cron.php`                   | Trigger Moodle cron          | ✅ Safe        |
+| Script                           | Purpose                                                |
+| -------------------------------- | ------------------------------------------------------ |
+| `create_categories.php`          | Ensures full Faculty -> Department -> Program hierarchy |
+| `setup_department_hierarchy.php` | Aligns categories, custom tables, and HOD scope        |
+| `create_all_courses.php`         | Creates centralized shared + program-specific courses   |
+| `create_lecturers.php`           | Creates lecturers and enforces one teacher per course   |
+| `apply_full_course_template.php` | Applies course images and summary styling              |
+| `run_cron.php`                   | Runs Moodle cron                                       |
 
-### Before Running Destructive Scripts
+_Last Updated: 2026-02-26_
 
-Always backup the database:
-
-```bash
-pg_dump -h localhost -U moodleuser -d moodle > backup_$(date +%Y%m%d).sql
-```
-
----
-
-_Last Updated: 2026-02-21_  
-_Moodle Version: 4.x_  
-_Custom Tables Version: 1.0_
