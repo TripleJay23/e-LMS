@@ -49,7 +49,7 @@ function local_profileenrol_validate_extend_signup_form($data)
       return $errors;
    }
 
-   if ($token->status === 'claimed') {
+   if (strtolower((string)$token->status) !== 'unused') {
       $errors['profile_field_reg_number'] = 'This registration number has already been used. Contact your administrator if this is an error.';
       return $errors;
    }

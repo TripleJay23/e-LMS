@@ -68,7 +68,7 @@ try {
       echo "• Student already enrolled in program\n";
    }
 
-   // Get all courses for this program
+   // Get all courses for this program.
    $programCourses = $DB->get_records('custom_program_courses', ['programid' => $program->id]);
 
    if (empty($programCourses)) {
@@ -83,9 +83,29 @@ try {
    echo "\nEnrolling in courses:\n";
 
    $enrolledCount = 0;
+   // Normalize duplicates by module code and prefer -SHARED for shared modules.
+   $selectedCourses = [];
    foreach ($programCourses as $pc) {
-      $course = $DB->get_record('course', ['id' => $pc->courseid]);
-      if (!$course) continue;
+      $course = $DB->get_record('course', ['id' => $pc->courseid], 'id,shortname,fullname', IGNORE_MISSING);
+      if (!$course) {
+         continue;
+      }
+      $code = trim((string)preg_replace('/-(?:SHARED|BIT|BCS)$/i', '', $course->shortname));
+
+      if (!isset($selectedCourses[$code])) {
+         $selectedCourses[$code] = $course;
+         continue;
+      }
+
+      $existing = $selectedCourses[$code];
+      $incomingShared = (bool)preg_match('/-SHARED$/i', $course->shortname);
+      $existingShared = (bool)preg_match('/-SHARED$/i', $existing->shortname);
+      if ($incomingShared && !$existingShared) {
+         $selectedCourses[$code] = $course;
+      }
+   }
+
+   foreach ($selectedCourses as $course) {
 
       // Check if manual enrolment instance exists
       $enrolInstance = $DB->get_record('enrol', [

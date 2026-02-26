@@ -153,6 +153,21 @@ foreach ($shared_modules as $module) {
          }
       }
    }
+
+   // Guardrail: if legacy shared course without suffix exists, unlink it from programs.
+   $legacy_course = $DB->get_record('course', ['shortname' => $module['code']]);
+   if ($legacy_course && (int)$legacy_course->id !== (int)$course->id) {
+      foreach ($target_programs as $p_acronym) {
+         $prog = $DB->get_record('custom_programs', ['acronym' => $p_acronym]);
+         if (!$prog) {
+            continue;
+         }
+         if ($DB->record_exists('custom_program_courses', ['programid' => $prog->id, 'courseid' => $legacy_course->id])) {
+            $DB->delete_records('custom_program_courses', ['programid' => $prog->id, 'courseid' => $legacy_course->id]);
+            echo "  - Removed legacy link from {$p_acronym} ({$module['code']})\n";
+         }
+      }
+   }
 }
 
 echo "\nCreated $created_shared unique shared instances in central hierarchy\n\n";
