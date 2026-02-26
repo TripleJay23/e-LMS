@@ -212,9 +212,9 @@ function build_summary_html(string $imageurl, array $meta): string
       . '  <img class="img-fluid" role="presentation" src="' . htmlspecialchars($imageurl, ENT_QUOTES) . '" alt="" width="300" height="168" loading="lazy" decoding="async" fetchpriority="low" />' . "\n"
       . '</p>' . "\n"
       . '<div class="course-description-box" style="background: #ffffff; border-left: 5px solid #0f6cbf; padding: 15px; margin-bottom: 20px; border-radius: 4px; font-size: 0.95rem; color: #222222; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">' . "\n"
-      . '  <strong>Academic Year: </strong>' . htmlspecialchars($meta['year_label'], ENT_QUOTES) . ' ' . "\n"
-      . '  <strong>Semester: </strong>' . htmlspecialchars($meta['semester_label'], ENT_QUOTES) . ' ' . "\n"
-      . '  <strong>Credit: </strong>' . htmlspecialchars((string)$meta['credits'], ENT_QUOTES) . ' ' . "\n"
+      . '  <strong>Academic Year: </strong>' . htmlspecialchars($meta['year_label'], ENT_QUOTES) . '<br>' . "\n"
+      . '  <strong>Semester: </strong>' . htmlspecialchars($meta['semester_label'], ENT_QUOTES) . '<br>' . "\n"
+      . '  <strong>Credit: </strong>' . htmlspecialchars((string)$meta['credits'], ENT_QUOTES) . '<br>' . "\n"
       . '  <strong>Course Type:</strong> ' . htmlspecialchars((string)$meta['course_type'], ENT_QUOTES) . "\n"
       . '</div>';
 }

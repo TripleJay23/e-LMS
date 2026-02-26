@@ -4,118 +4,210 @@ namespace local_profileenrol;
 
 defined('MOODLE_INTERNAL') || die();
 
-class observer
-{
+class observer {
 
-   /**
-    * Handle user_created event.
-    * At this point: user exists with confirmed=0, profile fields are saved.
-    * We do NOT auto-confirm — Moodle sends the confirmation email instead.
-    * We only validate the token here (no DB changes).
-    */
-   public static function user_created(\core\event\user_created $event)
-   {
-      // Intentionally empty — enrolment happens on first login after confirmation.
-      // The confirmation email is sent by auth_email right after this event.
-   }
+    /**
+     * Handle user_created event.
+     * No action is needed here; enrolment runs after confirmation/login.
+     */
+    public static function user_created(\core\event\user_created $event) {
+        // Intentionally empty.
+    }
 
-   /**
-    * Handle user_updated event (e.g. admin manually confirms a user).
-    */
-   public static function user_updated(\core\event\user_updated $event)
-   {
-      self::enrol_if_ready($event->objectid);
-   }
+    /**
+     * Handle user_updated event (e.g. admin confirmation).
+     */
+    public static function user_updated(\core\event\user_updated $event) {
+        self::enrol_if_ready((int)$event->objectid);
+    }
 
-   /**
-    * Handle user_loggedin event.
-    * This fires when the student clicks the confirmation link and is auto-logged in.
-    * confirm.php: user_confirm() sets confirmed=1, then complete_user_login() fires this.
-    */
-   public static function user_loggedin(\core\event\user_loggedin $event)
-   {
-      self::enrol_if_ready($event->objectid);
-   }
+    /**
+     * Handle user_loggedin event.
+     */
+    public static function user_loggedin(\core\event\user_loggedin $event) {
+        self::enrol_if_ready((int)$event->objectid);
+    }
 
-   /**
-    * Core logic: if user is confirmed and has an unclaimed reg token → enrol + claim.
-    * Runs at most once per user (token is claimed after first run).
-    */
-   private static function enrol_if_ready($userid)
-   {
-      global $DB, $CFG;
+    /**
+     * If user is confirmed and has a valid unused token, enrol and then claim token.
+     * The process is transactional and idempotent.
+     */
+    private static function enrol_if_ready(int $userid): void {
+        global $DB, $CFG;
 
-      $user = $DB->get_record('user', ['id' => $userid]);
-      if (!$user || empty($user->confirmed)) return;
+        $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+        if (!$user || empty($user->confirmed)) {
+            return;
+        }
 
-      // Load custom profile fields
-      require_once($CFG->dirroot . '/user/profile/lib.php');
-      profile_load_data($user);
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+        profile_load_data($user);
 
-      $program_acronym = $user->profile_field_program_study ?? null;
-      $year            = (int)($user->profile_field_year_of_study ?? 0);
-      $reg_number      = trim($user->profile_field_reg_number ?? '');
+        $programacronym = strtoupper(trim((string)($user->profile_field_program_study ?? '')));
+        $year = (int)($user->profile_field_year_of_study ?? 0);
+        $regnumber = trim((string)($user->profile_field_reg_number ?? ''));
 
-      if (!$program_acronym || !$year || !$reg_number) return;
+        if ($programacronym === '' || $year < 1 || $regnumber === '') {
+            return;
+        }
 
-      // ── Check for valid unclaimed registration token ────────────────────────
-      $token = $DB->get_record('custom_reg_tokens', ['reg_number' => $reg_number]);
-      if (!$token || $token->status === 'claimed') return; // already processed or invalid
+        $token = $DB->get_record('custom_reg_tokens', ['reg_number' => $regnumber], '*', IGNORE_MISSING);
+        if (!$token || !self::is_token_available($token)) {
+            return;
+        }
+        if (strcasecmp((string)$token->program, $programacronym) !== 0) {
+            return;
+        }
+        if ((int)$token->year !== $year) {
+            return;
+        }
 
-      if (strtoupper($token->program) !== strtoupper($program_acronym)) return;
-      if ((int)$token->year !== $year) return;
+        $program = $DB->get_record('custom_programs', ['acronym' => $programacronym], '*', IGNORE_MISSING);
+        if (!$program) {
+            return;
+        }
 
-      // ── Claim the token ────────────────────────────────────────────────────
-      $token->status      = 'claimed';
-      $token->userid      = $user->id;
-      $token->timeclaimed = time();
-      $DB->update_record('custom_reg_tokens', $token);
+        $links = $DB->get_records('custom_program_courses', [
+            'programid' => $program->id,
+            'year' => $year,
+        ]);
+        if (empty($links)) {
+            return;
+        }
 
-      // ── Enrol in all courses (suppress per-course notification emails) ─────
-      $program = $DB->get_record('custom_programs', ['acronym' => strtoupper($program_acronym)]);
-      if (!$program) return;
+        $courseids = self::get_canonical_course_ids($links);
+        if (empty($courseids)) {
+            return;
+        }
 
-      $links = $DB->get_records('custom_program_courses', [
-         'programid' => $program->id,
-         'year'      => $year,
-      ]);
-      if (!$links) return;
+        require_once($CFG->libdir . '/enrollib.php');
+        $manualenrol = enrol_get_plugin('manual');
+        if (!$manualenrol) {
+            return;
+        }
 
-      require_once($CFG->dirroot . '/course/lib.php');
-      require_once($CFG->libdir  . '/enrollib.php');
+        $studentrole = $DB->get_record('role', ['shortname' => 'student'], 'id', IGNORE_MISSING);
+        $roleid = $studentrole ? (int)$studentrole->id : 5;
+        $now = time();
 
-      $enrol  = enrol_get_plugin('manual');
-      if (!$enrol) return;
+        $prevnoemailever = $CFG->noemailever ?? false;
+        $CFG->noemailever = true;
 
-      $student_role = $DB->get_record('role', ['shortname' => 'student']);
-      $roleid       = $student_role ? $student_role->id : 5;
+        try {
+            $transaction = $DB->start_delegated_transaction();
 
-      // Suppress notification emails during bulk enrolment
-      $prev_noemailever = $CFG->noemailever ?? false;
-      $CFG->noemailever = true;
-
-      foreach ($links as $link) {
-         try {
-            $course = $DB->get_record('course', ['id' => $link->courseid]);
-            if (!$course) continue;
-
-            $context = \context_course::instance($course->id);
-            if (is_enrolled($context, $user->id)) continue;
-
-            $instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
-            if (!$instance) {
-               $iid      = $enrol->add_instance($course);
-               $instance = $DB->get_record('enrol', ['id' => $iid]);
+            // Re-load token inside transaction for safe idempotency.
+            $token = $DB->get_record('custom_reg_tokens', ['id' => $token->id], '*', MUST_EXIST);
+            if (!self::is_token_available($token)) {
+                $transaction->allow_commit();
+                return;
             }
 
-            $enrol->enrol_user($instance, $user->id, $roleid);
-         } catch (\Throwable $e) {
-            debugging('local_profileenrol: failed to enrol uid=' . $user->id .
-               ' in course=' . $link->courseid . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
-         }
-      }
+            foreach ($courseids as $courseid) {
+                $course = $DB->get_record('course', ['id' => $courseid], '*', IGNORE_MISSING);
+                if (!$course) {
+                    continue;
+                }
 
-      // Restore email setting
-      $CFG->noemailever = $prev_noemailever;
-   }
+                $context = \context_course::instance($courseid);
+                if (!is_enrolled($context, $user->id)) {
+                    $instance = $DB->get_record('enrol', ['courseid' => $courseid, 'enrol' => 'manual'], '*', IGNORE_MISSING);
+                    if (!$instance) {
+                        $instanceid = $manualenrol->add_instance($course);
+                        $instance = $DB->get_record('enrol', ['id' => $instanceid], '*', MUST_EXIST);
+                    }
+                    $manualenrol->enrol_user($instance, $user->id, $roleid);
+                }
+            }
+
+            $programenrol = $DB->get_record('custom_student_programs', [
+                'userid' => $user->id,
+                'programid' => $program->id,
+            ], '*', IGNORE_MISSING);
+
+            if (!$programenrol) {
+                $DB->insert_record('custom_student_programs', (object)[
+                    'userid' => $user->id,
+                    'programid' => $program->id,
+                    'yearofstudy' => $year,
+                    'status' => 'active',
+                    'timecreated' => $now,
+                    'timemodified' => $now,
+                ]);
+            } else if ((int)$programenrol->yearofstudy !== $year) {
+                $programenrol->yearofstudy = $year;
+                $programenrol->timemodified = $now;
+                $DB->update_record('custom_student_programs', $programenrol);
+            }
+
+            $token->status = 'claimed';
+            $token->userid = $user->id;
+            $token->timeclaimed = $now;
+            $DB->update_record('custom_reg_tokens', $token);
+
+            $transaction->allow_commit();
+        } catch (\Throwable $e) {
+            debugging(
+                'local_profileenrol: failed to complete enrolment for uid=' . $user->id . ': ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+        } finally {
+            $CFG->noemailever = $prevnoemailever;
+        }
+    }
+
+    /**
+     * Token is considered available only while unused.
+     */
+    private static function is_token_available(\stdClass $token): bool {
+        return strtolower((string)$token->status) === 'unused';
+    }
+
+    /**
+     * Select one canonical course per normalized module code.
+     * Prefers -SHARED when both legacy and shared copies are linked.
+     *
+     * @param \stdClass[] $links
+     * @return int[]
+     */
+    private static function get_canonical_course_ids(array $links): array {
+        global $DB;
+
+        $candidateids = [];
+        foreach ($links as $link) {
+            $candidateids[] = (int)$link->courseid;
+        }
+        $candidateids = array_values(array_unique($candidateids));
+        if (empty($candidateids)) {
+            return [];
+        }
+
+        $courses = $DB->get_records_list('course', 'id', $candidateids, '', 'id,shortname');
+        $selected = [];
+
+        foreach ($courses as $course) {
+            $basecode = self::normalise_course_code((string)$course->shortname);
+            if (!isset($selected[$basecode])) {
+                $selected[$basecode] = $course;
+                continue;
+            }
+
+            $existing = $selected[$basecode];
+            if (self::is_shared_course((string)$course->shortname) && !self::is_shared_course((string)$existing->shortname)) {
+                $selected[$basecode] = $course;
+            }
+        }
+
+        return array_values(array_map(static function($course): int {
+            return (int)$course->id;
+        }, $selected));
+    }
+
+    private static function normalise_course_code(string $shortname): string {
+        return trim((string)preg_replace('/-(?:SHARED|BIT|BCS)$/i', '', $shortname));
+    }
+
+    private static function is_shared_course(string $shortname): bool {
+        return (bool)preg_match('/-SHARED$/i', $shortname);
+    }
 }
