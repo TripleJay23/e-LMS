@@ -43,7 +43,7 @@ if (!$dept_cat) {
 // ── 2. Move BCS and BIT under Informatics ────────────────────────────────────
 echo "\nStep 2: Move BCS and BIT under Department of Informatics...\n";
 
-foreach (['BCS', 'BIT'] as $prog_idnum) {
+foreach (['BCS', 'BIT', 'COMMON'] as $prog_idnum) {
    $cat = $DB->get_record('course_categories', ['idnumber' => $prog_idnum]);
    if (!$cat) {
       echo "  WARN : Category $prog_idnum not found, skipping.\n";

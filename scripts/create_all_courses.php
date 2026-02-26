@@ -99,64 +99,30 @@ foreach ($programs as $program) {
 
 echo "\n\n";
 
-// STEP 2: Create Shared Courses (Split between BIT and BCS)
-echo "Step 2: Creating Shared Courses (Splitting)\n";
+// STEP 2: Create Shared Courses (Centralized)
+echo "Step 2: Creating Shared Courses (Centralized)\n";
 echo str_repeat("-", 60) . "\n";
 
-$created_shared_bit = 0;
-$created_shared_bcs = 0;
+$created_shared = 0;
 
 foreach ($shared_modules as $module) {
-   // 1. Create for BIT
    $ys = get_year_semester($module['semester']);
-   $cat_key = "BIT_Y{$ys['year']}_S{$ys['sem']}";
-   $category_id = $categories[$cat_key] ?? $programs[0]; // Fallback
+   $cat_key = "common_y{$ys['year']}_s{$ys['sem']}";
+   $category_id = $DB->get_field('course_categories', 'id', ['idnumber' => $cat_key]);
 
-   $shortname_bit = $module['code'] . "-BIT";
-
-   if (!$DB->record_exists('course', ['shortname' => $shortname_bit])) {
-      $courseData = new stdClass();
-      $courseData->fullname = $module['name'];
-      $courseData->shortname = $shortname_bit;
-      $courseData->category = $category_id;
-      $courseData->summary = "Credit Hours: {$module['credits']}<br>Type: {$module['type']}<br>Program: BIT (Shared Module)";
-      $courseData->summaryformat = FORMAT_HTML;
-      $courseData->format = 'topics';
-      $courseData->numsections = 12;
-      $courseData->startdate = time();
-      $courseData->visible = 1;
-
-      $course = create_course($courseData);
-
-      // AUTO-LINK: Add to mdl_custom_program_courses
-      $bit_program = $DB->get_record('custom_programs', ['acronym' => 'BIT']);
-      if ($bit_program) {
-         $link = new stdClass();
-         $link->programid = $bit_program->id;
-         $link->courseid = $course->id;
-         $link->year = $ys['year'];
-         $link->semester = $ys['sem'];
-         $link->timecreated = time();
-         $DB->insert_record('custom_program_courses', $link);
-      }
-
-      echo "✓ BIT: {$module['name']} ({$shortname_bit}) [ID: {$course->id}]\n";
-      $created_shared_bit++;
+   if (!$category_id) {
+      echo "⚠ Warning: Category {$cat_key} not found for shared module {$module['code']}. Skipping.\n";
+      continue;
    }
 
-   // 2. Create for BCS
-   $ys = get_year_semester($module['semester']);
-   $cat_key = "BCS_Y{$ys['year']}_S{$ys['sem']}";
-   $category_id = $categories[$cat_key] ?? $programs[1];
+   $shortname_shared = $module['code'] . "-SHARED";
 
-   $shortname_bcs = $module['code'] . "-BCS";
-
-   if (!$DB->record_exists('course', ['shortname' => $shortname_bcs])) {
+   if (!$DB->record_exists('course', ['shortname' => $shortname_shared])) {
       $courseData = new stdClass();
       $courseData->fullname = $module['name'];
-      $courseData->shortname = $shortname_bcs;
+      $courseData->shortname = $shortname_shared;
       $courseData->category = $category_id;
-      $courseData->summary = "Credit Hours: {$module['credits']}<br>Type: {$module['type']}<br>Program: BCS (Shared Module)";
+      $courseData->summary = "Credit Hours: {$module['credits']}<br>Type: {$module['type']}<br>Shared Module (BIT & BCS)";
       $courseData->summaryformat = FORMAT_HTML;
       $courseData->format = 'topics';
       $courseData->numsections = 12;
@@ -164,26 +130,32 @@ foreach ($shared_modules as $module) {
       $courseData->visible = 1;
 
       $course = create_course($courseData);
+      echo "✓ SHARED: {$module['name']} ({$shortname_shared}) [ID: {$course->id}]\n";
+      $created_shared++;
+   } else {
+      $course = $DB->get_record('course', ['shortname' => $shortname_shared]);
+   }
 
-      // AUTO-LINK: Add to mdl_custom_program_courses
-      $bcs_program = $DB->get_record('custom_programs', ['acronym' => 'BCS']);
-      if ($bcs_program) {
-         $link = new stdClass();
-         $link->programid = $bcs_program->id;
-         $link->courseid = $course->id;
-         $link->year = $ys['year'];
-         $link->semester = $ys['sem'];
-         $link->timecreated = time();
-         $DB->insert_record('custom_program_courses', $link);
+   // Ensure linking to both programs
+   $target_programs = ['BIT', 'BCS'];
+   foreach ($target_programs as $p_acronym) {
+      $prog = $DB->get_record('custom_programs', ['acronym' => $p_acronym]);
+      if ($prog) {
+         if (!$DB->record_exists('custom_program_courses', ['programid' => $prog->id, 'courseid' => $course->id])) {
+            $link = new stdClass();
+            $link->programid = $prog->id;
+            $link->courseid = $course->id;
+            $link->year = $ys['year'];
+            $link->semester = $ys['sem'];
+            $link->timecreated = time();
+            $DB->insert_record('custom_program_courses', $link);
+            echo "  + Linked to {$p_acronym}\n";
+         }
       }
-
-      echo "✓ BCS: {$module['name']} ({$shortname_bcs}) [ID: {$course->id}]\n";
-      $created_shared_bcs++;
    }
 }
 
-echo "\nCreated $created_shared_bit BIT shared instances\n";
-echo "Created $created_shared_bcs BCS shared instances\n\n";
+echo "\nCreated $created_shared unique shared instances in central hierarchy\n\n";
 
 // STEP 3: Create BIT-only Courses
 echo "Step 3: Creating BIT-only Courses\n";

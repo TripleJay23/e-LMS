@@ -60,7 +60,61 @@ try {
    echo "  • Total programs: " . count($programs) . "\n";
    echo "  • New categories created: $categoryCount\n\n";
 
-   echo "Next steps:\n";
+
+   // ── Create Shared Modules Hierarchy ────────────────────────────────────────
+   echo "\nCreating Shared Modules hierarchy...\n";
+   $shared_idnum = 'COMMON'; // As used in create_hod.php
+   $shared_cat_record = $DB->get_record('course_categories', ['idnumber' => $shared_idnum]);
+
+   if (!$shared_cat_record) {
+      $sharedData = new stdClass();
+      $sharedData->name = 'Shared Modules';
+      $sharedData->idnumber = $shared_idnum;
+      $sharedData->description = 'Courses shared across multiple programs (BIT, BCS, etc.)';
+      $sharedData->parent = 0;
+      $sharedData->visible = 1;
+      $shared_cat = core_course_category::create($sharedData);
+      echo "✓ Created: Shared Modules (ID: {$shared_cat->id})\n";
+   } else {
+      $shared_cat = core_course_category::get($shared_cat_record->id);
+      echo "• Shared Modules already exists (ID: {$shared_cat->id})\n";
+   }
+
+   // Create Year/Semester subcategories for Shared Modules
+   for ($year = 1; $year <= 3; $year++) {
+      $year_idnum = "common_y{$year}";
+      $year_cat_record = $DB->get_record('course_categories', ['idnumber' => $year_idnum]);
+
+      if (!$year_cat_record) {
+         $year_cat = core_course_category::create([
+            'name' => "Year $year",
+            'idnumber' => $year_idnum,
+            'parent' => $shared_cat->id,
+            'visible' => 1
+         ]);
+         echo "  ✓ Shared Year $year (ID: {$year_cat->id})\n";
+      } else {
+         $year_cat = core_course_category::get($year_cat_record->id);
+         echo "  • Shared Year $year exists (ID: {$year_cat->id})\n";
+      }
+
+      for ($sem = 1; $sem <= 2; $sem++) {
+         $sem_idnum = "common_y{$year}_s{$sem}";
+         if (!$DB->record_exists('course_categories', ['idnumber' => $sem_idnum])) {
+            $sem_cat = core_course_category::create([
+               'name' => "Semester $sem",
+               'idnumber' => $sem_idnum,
+               'parent' => $year_cat->id,
+               'visible' => 1
+            ]);
+            echo "    ✓ Shared Semester $sem (ID: {$sem_cat->id})\n";
+         } else {
+            echo "    • Shared Semester $sem exists\n";
+         }
+      }
+   }
+
+   echo "\nNext steps:\n";
    echo "  1. Create courses within these categories\n";
    echo "  2. Assign facilitators to courses\n";
    echo "  3. Add course content (PDFs, videos, quizzes)\n\n";

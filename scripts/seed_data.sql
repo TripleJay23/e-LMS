@@ -48,8 +48,6 @@ BEGIN
     -- Insert Programs for Computer Science and Mathematics
     INSERT INTO mdl_custom_programs (departmentid, name, acronym, level, duration, timecreated, timemodified)
     VALUES 
-        (dept_csm_id, 'Ordinary Diploma in Computer Science', 'DCS', 'diploma', 4, 
-         EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT),
         (dept_csm_id, 'Bachelor Degree in Computer Science', 'BCS', 'bachelor', 6, 
          EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
     ON CONFLICT DO NOTHING;
@@ -57,10 +55,6 @@ BEGIN
     -- Insert Programs for Information Systems
     INSERT INTO mdl_custom_programs (departmentid, name, acronym, level, duration, timecreated, timemodified)
     VALUES 
-        (dept_is_id, 'Basic Technician Certificate in Computing and Information Technology', 'BTCIT', 'certificate', 2, 
-         EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT),
-        (dept_is_id, 'Ordinary Diploma in Information Technology', 'DIT', 'diploma', 4, 
-         EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT),
         (dept_is_id, 'Bachelor Degree in Information Technology', 'BIT', 'bachelor', 6, 
          EXTRACT(EPOCH FROM NOW())::BIGINT, EXTRACT(EPOCH FROM NOW())::BIGINT)
     ON CONFLICT DO NOTHING;

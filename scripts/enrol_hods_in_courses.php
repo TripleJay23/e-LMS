@@ -14,16 +14,24 @@ echo "║      Enrolling HODs in Program Courses                ║\n";
 echo "╚════════════════════════════════════════════════════════╝\n\n";
 
 // Configurations
+$bit_cat = $DB->get_record('course_categories', ['idnumber' => 'BIT']);
+$bcs_cat = $DB->get_record('course_categories', ['idnumber' => 'BCS']);
+$shared_cat = $DB->get_record('course_categories', ['idnumber' => 'COMMON']);
+
 $configs = [
    [
       'username' => 'hod_bit',
-      'cat_id' => 3, // BIT
-      'role' => 'manager' // Enrol as Manager? Or Teacher?
-      // Manager enrollment allows them to see it in dashboard
+      'categories' => [$bit_cat->id ?? 0, $shared_cat->id ?? 0],
+      'role' => 'manager'
    ],
    [
       'username' => 'hod_bcs',
-      'cat_id' => 2, // BCS
+      'categories' => [$bcs_cat->id ?? 0, $shared_cat->id ?? 0],
+      'role' => 'manager'
+   ],
+   [
+      'username' => 'hod_informatics',
+      'categories' => [$shared_cat->id ?? 0, $bit_cat->id ?? 0, $bcs_cat->id ?? 0],
       'role' => 'manager'
    ]
 ];
@@ -38,55 +46,57 @@ foreach ($configs as $conf) {
       continue;
    }
 
-   echo "Processing {$user->username} (Category ID: {$conf['cat_id']})...\n";
+   echo "Processing {$user->username}...\n";
 
-   // Find all courses in this category and subcategories
-   // We use the category path to find all children
-   $category = $DB->get_record('course_categories', ['id' => $conf['cat_id']]);
-   if (!$category) {
-      echo "  Category not found.\n";
-      continue;
-   }
+   foreach ($conf['categories'] as $cat_id) {
+      if (!$cat_id) continue;
 
-   // Get all courses where category path starts with this category path
-   $sql = "SELECT c.id, c.shortname, c.fullname 
-            FROM {course} c 
-            JOIN {course_categories} cc ON c.category = cc.id 
-            WHERE cc.path LIKE ? OR cc.path LIKE ?";
-
-   // Path can be /ID or /.../ID/...
-   // But simplified: path LIKE '/ID/%' OR path = '/ID'
-   $path_search = $category->path . '/%';
-   $exact_path = $category->path;
-
-   $courses = $DB->get_records_sql($sql, [$path_search, $exact_path]);
-
-   echo "  Found " . count($courses) . " courses in hierarchy.\n";
-   $enrolled_count = 0;
-
-   foreach ($courses as $course) {
-      // Check if manual enrolment exists
-      $enrol_instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
-      if (!$enrol_instance) {
-         $enrol_instance = $manual_enrol->add_default_instance($course);
-         $enrol_instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
-      }
-
-      // Check availability
-      if (!$manual_enrol->allow_enrol($enrol_instance)) {
-         echo "  ⚠ Cannot enrol in {$course->shortname}\n";
+      $category = $DB->get_record('course_categories', ['id' => $cat_id]);
+      if (!$category) {
+         echo "  Category ID {$cat_id} not found. Skipping.\n";
          continue;
       }
 
-      // Enrol user
-      if (!$DB->record_exists('user_enrolments', ['enrolid' => $enrol_instance->id, 'userid' => $user->id])) {
-         $manual_enrol->enrol_user($enrol_instance, $user->id, $manager_role->id);
-         // echo "    + Enrolled in {$course->shortname}\n"; // Verbose
-         $enrolled_count++;
-      }
-   }
+      echo "  Checking courses in category: {$category->name}...\n";
 
-   echo "  ✓ Enrolled {$user->username} in {$enrolled_count} new courses.\n\n";
+      // Get all courses where category path starts with this category path
+      $sql = "SELECT c.id, c.shortname, c.fullname 
+               FROM {course} c 
+               JOIN {course_categories} cc ON c.category = cc.id 
+               WHERE cc.path LIKE ? OR cc.path LIKE ?";
+
+      $path_search = $category->path . '/%';
+      $exact_path = $category->path;
+
+      $courses = $DB->get_records_sql($sql, [$path_search, $exact_path]);
+
+      echo "    Found " . count($courses) . " courses in hierarchy.\n";
+      $enrolled_count = 0;
+
+      foreach ($courses as $course) {
+         // Check if manual enrolment exists
+         $enrol_instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
+         if (!$enrol_instance) {
+            $enrol_instance = $manual_enrol->add_default_instance($course);
+            $enrol_instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
+         }
+
+         // Check availability
+         if (!$manual_enrol->allow_enrol($enrol_instance)) {
+            echo "  ⚠ Cannot enrol in {$course->shortname}\n";
+            continue;
+         }
+
+         // Enrol user
+         if (!$DB->record_exists('user_enrolments', ['enrolid' => $enrol_instance->id, 'userid' => $user->id])) {
+            $manual_enrol->enrol_user($enrol_instance, $user->id, $manager_role->id);
+            // echo "    + Enrolled in {$course->shortname}\n"; // Verbose
+            $enrolled_count++;
+         }
+      }
+      echo "    ✓ Enrolled {$user->username} in {$enrolled_count} new courses in {$category->name}.\n";
+   }
+   echo "  ✓ Done processing {$user->username}.\n\n";
 }
 
 echo "Done!\n";

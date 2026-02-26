@@ -122,15 +122,28 @@ foreach ($courses as $course) {
     $year_label = "Year $year_num";
     $sem_label  = "Semester " . ($sem_roman[$sem_num] ?? $sem_num);
 
-    // ── 3b. Pick & upload image ───────────────────────────────────────────────
+    // ── 3b. Direct Image URL (Nginx) ──────────────────────────────────────────
     $image_path = $images[$img_index % count($images)];
     $image_name = basename($image_path);
     $img_index++;
 
+    // Ensure the image exists in the public directory
+    $public_image_dir = __DIR__ . '/../moodle/public/local/courseimages';
+    if (!is_dir($public_image_dir)) {
+        mkdir($public_image_dir, 0777, true);
+    }
+    $public_image_path = $public_image_dir . '/' . $image_name;
+    if (!file_exists($public_image_path)) {
+        copy($image_path, $public_image_path);
+    }
+
     $context     = context_course::instance($course->id);
     $encoded_name = rawurlencode($image_name);
 
-    // Clear existing summary file area
+    // Build the direct URL (no pluginfile.php involvement)
+    $direct_url = '/local/courseimages/' . $encoded_name;
+
+    // Optional: Cleanup old summary files from internal storage to free up space
     $existing_files = $fs->get_area_files($context->id, 'course', 'summary', 0);
     foreach ($existing_files as $f) {
         if ($f->get_filename() !== '.') {
@@ -138,39 +151,20 @@ foreach ($courses as $course) {
         }
     }
 
-    $file_record = [
-        'contextid'    => $context->id,
-        'component'    => 'course',
-        'filearea'     => 'summary',
-        'itemid'       => 0,
-        'filepath'     => '/',
-        'filename'     => $image_name,
-        'timecreated'  => time(),
-        'timemodified' => time(),
-    ];
-
-    try {
-        $fs->create_file_from_pathname($file_record, $image_path);
-    } catch (Exception $e) {
-        echo "❌ File upload error: " . $e->getMessage() . "\n";
-        $errors++;
-        continue;
-    }
-
     // ── 3c. Build the full summary HTML ───────────────────────────────────────
     $img_html = '<p style="text-align: center;"><img class="img-fluid" role="presentation"'
-              . ' src="@@PLUGINFILE@@/' . $encoded_name . '"'
-              . ' alt="" width="300" height="168"></p>';
+        . ' src="' . $direct_url . '"'
+        . ' alt="" width="300" height="168" loading="lazy"></p>';
 
     $box_html = '<div class="course-description-box"'
-              . ' style="background: #ffffff; border-left: 5px solid #0f6cbf;'
-              . ' padding: 15px; margin-bottom: 20px; border-radius: 4px;'
-              . ' font-size: 0.95rem; color: #222222; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">'
-              . '<strong>Academic Year: </strong>' . htmlspecialchars($year_label)
-              . ' <br><strong>Semester: </strong>' . htmlspecialchars($sem_label)
-              . ' <br><strong>Credit: </strong>' . htmlspecialchars($credits)
-              . ' <br><strong>Course Type:</strong> ' . htmlspecialchars($course_type)
-              . '</div>';
+        . ' style="background: #ffffff; border-left: 5px solid #0f6cbf;'
+        . ' padding: 15px; margin-bottom: 20px; border-radius: 4px;'
+        . ' font-size: 0.95rem; color: #222222; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">'
+        . '<strong>Academic Year: </strong>' . htmlspecialchars($year_label)
+        . ' <br><strong>Semester: </strong>' . htmlspecialchars($sem_label)
+        . ' <br><strong>Credit: </strong>' . htmlspecialchars($credits)
+        . ' <br><strong>Course Type:</strong> ' . htmlspecialchars($course_type)
+        . '</div>';
 
     $new_summary = $img_html . "\n" . $box_html;
 

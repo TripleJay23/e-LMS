@@ -14,7 +14,7 @@ A Moodle-based e-Learning Management System customized for the Faculty of Inform
 
 ### Users
 
-- **Students:** 28
+- **Students:** 6
 - **Facilitators (Teachers):** 7
 - **HOD (Manager):** 1 — `hod_informatics` (system-wide access)
 - **Admin:** 1
@@ -69,7 +69,7 @@ A Moodle-based e-Learning Management System customized for the Faculty of Inform
 
 ## Technology Stack
 
-- **Platform**: Moodle 4.x
+- **Platform**: Moodle 5.1.3 (Build: 20260216)
 - **Database**: PostgreSQL
 - **Web Server**: Nginx
 - **PHP**: 8.x
