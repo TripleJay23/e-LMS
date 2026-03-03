@@ -1,0 +1,60 @@
+{{!
+    @template theme_boost/login
+
+    Login page template override for Modern Blue theme.
+}}
+{{> theme_boost/head }}
+
+<body {{{ bodyattributes }}}>
+{{> core/local/toast/wrapper}}
+
+<div id="page-wrapper" class="pagelayout-login">
+
+    {{{ output.standard_top_of_body_html }}}
+
+    <div id="page" class="container-fluid pt-5 mt-0">
+        <div id="page-content" class="row justify-content-center">
+            <div id="region-main-box" class="col-12 d-flex justify-content-center">
+                <section id="region-main" class="col-12 h-100" aria-label="{{#str}}content{{/str}}">
+                    <div class="modern-blue-auth-shell">
+                        <aside class="modern-blue-auth-brand" aria-hidden="true">
+                            <div class="modern-blue-auth-brand-glow modern-blue-auth-brand-glow-top"></div>
+                            <div class="modern-blue-auth-brand-glow modern-blue-auth-brand-glow-bottom"></div>
+                            <div class="modern-blue-auth-brand-inner">
+                                {{#output.get_logo_url}}
+                                    <div class="modern-blue-auth-logo-wrap">
+                                        <img src="{{output.get_logo_url}}" alt="{{sitename}}" class="modern-blue-auth-logo img-fluid">
+                                    </div>
+                                {{/output.get_logo_url}}
+                                <p class="modern-blue-auth-brand-title">
+                                    {{#sitename}}{{sitename}}{{/sitename}}
+                                    {{^sitename}}IAA e-LMS{{/sitename}}
+                                </p>
+                            </div>
+                        </aside>
+                        <div class="modern-blue-auth-content">
+                            <div class="modern-blue-auth-content-inner">
+                                {{{ output.main_content }}}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    {{> theme_boost/footer }}
+</div>
+
+</body>
+</html>
+{{#js}}
+M.util.js_pending('theme_boost/loader');
+require(['theme_boost/loader'], function() {
+  M.util.js_complete('theme_boost/loader');
+});
+// Initialize our theme JS
+require(['theme_modern_blue/theme'], function(Theme) {
+    Theme.init();
+});
+{{/js}}

@@ -163,29 +163,802 @@ a {
   }
 }
 
-// Login Page Specifics
+// Login and Signup Pages (Figma-aligned auth shell)
 .pagelayout-login {
-  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  background: linear-gradient(141deg, #e0f2fe 0%, #f0f9ff 100%);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
-  #page {
+  #page-wrapper,
+  #page,
+  #region-main-box,
+  #region-main {
     background: transparent;
-    margin-top: 0 !important;
   }
 
-  .login-container {
-    @include glassmorphism;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    max-width: 500px;
+  #page {
+    margin-top: 0 !important;
+    padding-top: clamp(1rem, 5vh, 3rem);
+    padding-bottom: clamp(1rem, 4vh, 2.5rem);
+  }
+
+  #region-main-box,
+  #region-main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  #region-main {
+    overflow: visible;
+  }
+
+  .modern-blue-auth-shell {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.28);
+    display: flex;
+    margin: 0 auto;
+    max-width: 1024px;
+    min-height: 600px;
+    overflow: hidden;
     width: 100%;
   }
 
-  .login-logo {
-    margin-bottom: 2rem;
+  .modern-blue-auth-brand {
+    align-items: center;
+    background: linear-gradient(
+      123deg,
+      rgba(15, 108, 189, 0.12) 0%,
+      rgba(15, 108, 189, 0.05) 100%
+    );
+    display: flex;
+    flex: 0 0 41.6%;
+    justify-content: center;
+    max-width: 41.6%;
+    min-width: 320px;
+    overflow: hidden;
+    padding: 3rem 2rem;
+    position: relative;
+  }
+
+  .modern-blue-auth-brand-glow {
+    border-radius: 9999px;
+    filter: blur(32px);
+    position: absolute;
+  }
+
+  .modern-blue-auth-brand-glow-top {
+    background: rgba(15, 108, 189, 0.1);
+    height: 16rem;
+    left: -8rem;
+    top: -8rem;
+    width: 16rem;
+  }
+
+  .modern-blue-auth-brand-glow-bottom {
+    background: rgba(96, 165, 250, 0.11);
+    bottom: -6.75rem;
+    height: 20rem;
+    right: -6.75rem;
+    width: 20rem;
+  }
+
+  .modern-blue-auth-brand-inner {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+
+  .modern-blue-auth-logo-wrap {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    max-width: 14.5rem;
+  }
+
+  .modern-blue-auth-logo {
+    max-height: 14rem;
+    object-fit: contain;
+  }
+
+  .modern-blue-auth-brand-title {
+    color: #1e293b;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-align: center;
+  }
+
+  .modern-blue-auth-content {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.92);
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 3rem 2.5rem;
+  }
+
+  .modern-blue-auth-content-inner {
+    max-width: 385px;
+    width: 100%;
+  }
+
+  .loginform,
+  .modern-blue-signup-form {
+    margin: 0;
+    width: 100%;
+  }
+
+  .loginform > #loginlogo,
+  .loginform > .login-heading:first-of-type {
+    display: none;
+  }
+
+  .loginform::before {
+    color: #1e293b;
+    content: "Welcome back";
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 1.5rem;
+  }
+
+  .loginform .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .loginform .login-form > .mb-3 {
+    margin-bottom: 0 !important;
+  }
+
+  .loginform .login-form-username label.visually-hidden,
+  .loginform .login-form-password label.visually-hidden {
+    clip: auto !important;
+    clip-path: none !important;
+    color: #334155;
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    height: auto !important;
+    margin: 0 0 0.375rem;
+    overflow: visible;
+    position: static !important;
+    white-space: normal;
+    width: auto !important;
+  }
+
+  .loginform .login-form-forgotpassword {
+    margin-top: -0.35rem !important;
+    order: 3;
+    text-align: right;
+  }
+
+  .loginform .login-form-recaptcha {
+    order: 4;
+  }
+
+  .loginform .login-form-submit {
+    order: 5;
+  }
+
+  .loginform .form-control,
+  .modern-blue-signup-form .form-control,
+  .modern-blue-signup-form .custom-select,
+  .modern-blue-signup-form .form-select {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    box-shadow: none;
+    color: #334155;
+    min-height: 3.125rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .loginform .form-control::placeholder,
+  .modern-blue-signup-form .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .loginform .form-control:focus,
+  .modern-blue-signup-form .form-control:focus,
+  .modern-blue-signup-form .custom-select:focus,
+  .modern-blue-signup-form .form-select:focus {
+    background: #ffffff;
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 0.2rem rgba(14, 116, 215, 0.15);
+  }
+
+  .loginform #loginbtn,
+  .modern-blue-signup-form .btn-primary {
+    background: #0f6cbd;
+    border-color: #0f6cbd;
+    border-radius: 0.5rem;
+    box-shadow:
+      0 10px 15px -3px rgba(59, 130, 246, 0.2),
+      0 4px 6px -4px rgba(59, 130, 246, 0.2);
+    font-size: 1rem;
+    font-weight: 600;
+    min-height: 3rem;
+    width: 100%;
+  }
+
+  .loginform #loginbtn:hover,
+  .loginform #loginbtn:focus,
+  .modern-blue-signup-form .btn-primary:hover,
+  .modern-blue-signup-form .btn-primary:focus {
+    background: #0d5d9f;
+    border-color: #0d5d9f;
+  }
+
+  .loginform .login-signup .btn-secondary,
+  .loginform #guestlogin .btn-secondary {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    color: #334155;
+    font-weight: 500;
+    min-height: 2.875rem;
+    width: 100%;
+  }
+
+  .loginform .login-signup .btn-secondary:hover,
+  .loginform #guestlogin .btn-secondary:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1e293b;
+  }
+
+  .loginform .login-divider {
+    border-top: 1px solid #f1f5f9;
+    margin: 1rem 0;
+  }
+
+  .loginform > .d-flex {
+    justify-content: center;
+  }
+
+  .loginform .login-languagemenu,
+  .loginform .divider.border-start {
+    display: none !important;
+  }
+
+  .loginform > .d-flex > .btn-secondary {
+    background: transparent;
+    border: 0;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 400;
+    min-height: auto;
+    padding: 0;
+    width: auto;
+  }
+
+  .loginform > .d-flex > .btn-secondary:hover,
+  .loginform > .d-flex > .btn-secondary:focus {
+    background: transparent;
+    color: #64748b;
+    text-decoration: underline;
+  }
+
+  &#page-login-signup .modern-blue-auth-content {
+    align-items: flex-start;
+    padding: 2.5rem 1.6rem 2rem;
+  }
+
+  &#page-login-signup .modern-blue-auth-content-inner {
+    max-width: 570px;
+  }
+
+  .modern-blue-signup-form > .login-heading {
+    display: none;
+  }
+
+  .modern-blue-signup-form .mform {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    padding: 0.95rem 1rem 1rem;
+  }
+
+  .modern-blue-signup-form .mform fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .modern-blue-signup-form .mform fieldset > legend {
+    display: none;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section {
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-toggle {
+    align-items: center;
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(36, 94, 230, 0.08);
+    border: 0;
+    color: #1f2937;
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    justify-content: space-between;
+    line-height: 1.25;
+    min-height: 4.1rem;
+    outline: none;
+    padding: 0.95rem 1.15rem;
+    text-align: left;
+    transition: background-color 0.2s ease;
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-toggle:hover {
+    background: rgba(191, 219, 254, 0.52);
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-toggle:focus-visible {
+    box-shadow:
+      inset 0 0 0 2px rgba(15, 108, 189, 0.3),
+      0 0 0 3px rgba(191, 219, 254, 0.6);
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section:not(.is-open) .modern-blue-signup-section-toggle {
+    background: rgba(236, 242, 253, 0.62);
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-title-wrap {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.75rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-step {
+    align-items: center;
+    background: #ffffff;
+    border: 2px solid #0f6cb5;
+    border-radius: 50%;
+    color: #0f6cb5;
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 700;
+    height: 2rem;
+    justify-content: center;
+    width: 2rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section.is-open .modern-blue-signup-step {
+    background: #0f6cb5;
+    box-shadow:
+      0 4px 6px -1px rgba(15, 108, 181, 0.28),
+      0 2px 4px -2px rgba(15, 108, 181, 0.2);
+    color: #ffffff;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-chevron {
+    height: 0.75rem;
+    position: relative;
+    width: 0.75rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-chevron::before {
+    border-right: 2px solid #64748b;
+    border-top: 2px solid #64748b;
+    content: "";
+    display: block;
+    height: 0.55rem;
+    transform: rotate(135deg);
+    transition: transform 0.2s ease;
+    width: 0.55rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section.is-open .modern-blue-signup-chevron::before {
+    transform: rotate(-45deg);
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel {
+    display: grid;
+    background: rgba(255, 255, 255, 0.58);
+    gap: 0.95rem 1.1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0.95rem 1.15rem 1.05rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel[hidden] {
+    display: none !important;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > .modern-blue-signup-row,
+  .modern-blue-signup-form .modern-blue-signup-section-panel > .fdescription,
+  .modern-blue-signup-form .modern-blue-signup-section-panel > #fitem_id_policyagreed,
+  .modern-blue-signup-form .modern-blue-signup-section-panel > #fitem_id_auth_instructions,
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem {
+    grid-column: 1 / -1;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > .modern-blue-signup-row.modern-blue-row-half {
+    grid-column: auto;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > .modern-blue-signup-row {
+    margin: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .fitem.row,
+  .modern-blue-signup-form .modern-blue-signup-section-panel .form-group.row {
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem > legend,
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem > .d-flex.align-items-center.mb-2 {
+    display: none !important;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem > .fcontainer,
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem > .fcontainer.collapse {
+    display: block !important;
+    height: auto !important;
+    visibility: visible !important;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel > fieldset.fitem .fcontainer > .fitem.row {
+    margin-bottom: 0.9rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-empty {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 0.35rem 0;
+    grid-column: 1 / -1;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .col-md-3,
+  .modern-blue-signup-form .modern-blue-signup-section-panel .col-md-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .col-form-label {
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 0 0.28rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .form-label-addon {
+    display: none;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .felement {
+    padding: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .form-control,
+  .modern-blue-signup-form .modern-blue-signup-section-panel .form-select,
+  .modern-blue-signup-form .modern-blue-signup-section-panel .custom-select {
+    background: rgba(255, 255, 255, 0.65);
+    border-color: #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    min-height: 2.75rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .form-control-static {
+    color: #6b7280;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    padding: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .form-control-feedback {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-section-panel .modern-blue-field-hint {
+    color: #6b7280;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    margin: 0.3rem 0 0;
+  }
+
+  .modern-blue-signup-form .mform .fdescription.required {
+    background: rgba(36, 94, 230, 0.08);
+    border: 1px solid #eeefef;
+    border-radius: 0.625rem;
+    color: #4b5563;
+    font-size: 0.78rem;
+    margin: 0 0 0.3rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .modern-blue-signup-form .mform .fitem.row,
+  .modern-blue-signup-form .mform .form-group.row {
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .mform .fitem .col-md-3,
+  .modern-blue-signup-form .mform .fitem .col-md-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .modern-blue-signup-form .mform .fitem .col-form-label {
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+    padding-top: 0;
+  }
+
+  .modern-blue-signup-form .mform .fitem .form-label-addon {
+    min-height: 20px;
+  }
+
+  .modern-blue-signup-form .mform .fitem .form-control-feedback {
+    margin-top: 0.3rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-utility {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.2rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-recaptcha,
+  .modern-blue-signup-form #fitem_id_recaptcha_element .felement {
+    background: rgba(249, 250, 251, 0.82);
+    border: 1px solid #d3d5d6;
+    border-radius: 0.5rem;
+    min-height: 4.3rem;
+    padding: 0.75rem 0.95rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-recaptcha {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-recaptcha-check {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    display: inline-block;
+    flex: 0 0 auto;
+    height: 1.15rem;
+    width: 1.15rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-recaptcha-text {
+    color: #374151;
+    flex: 1 1 auto;
+    font-size: 0.875rem;
+    margin-left: 0.72rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-recaptcha-badge {
+    color: #9ca3af;
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .modern-blue-signup-form #fitem_id_recaptcha_element {
+    margin: 0;
+  }
+
+  .modern-blue-signup-form #fitem_id_recaptcha_element .col-md-3 {
+    display: none;
+  }
+
+  .modern-blue-signup-form #fitem_id_recaptcha_element .col-md-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row,
+  .modern-blue-signup-form #fgroup_id_buttonar.modern-blue-signup-actions-row,
+  .modern-blue-signup-form .fitem_actionbuttons.modern-blue-signup-actions-row {
+    border-top: 1px solid rgba(229, 231, 235, 0.8);
+    margin: 0;
+    padding-top: 1rem;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row .col-md-3 {
+    display: none;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row .col-md-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row .felement {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row .felement > .w-100 > .d-flex {
+    align-items: stretch !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row .felement .mb-3 {
+    margin: 0 !important;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row #id_submitbutton {
+    background: #106dbd;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    min-height: 2.85rem;
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row #id_submitbutton:hover,
+  .modern-blue-signup-form .modern-blue-signup-actions-row #id_submitbutton:focus {
+    background: #0d5d9f;
+    border-color: #0d5d9f;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-actions-row .btn-cancel {
+    display: none !important;
+  }
+
+  .modern-blue-signup-form #fgroup_id_buttonar .btn-secondary,
+  .modern-blue-signup-form .fitem_actionbuttons .btn-secondary {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: #0f6cbd;
+    font-weight: 600;
+    min-height: auto;
+    padding: 0;
+    width: auto;
+  }
+
+  .modern-blue-signup-form #fgroup_id_buttonar .btn-secondary:hover,
+  .modern-blue-signup-form .fitem_actionbuttons .btn-secondary:hover {
+    background: transparent;
+    color: #0d5d9f;
+    text-decoration: underline;
+  }
+
+  .modern-blue-signup-form .modern-blue-login-prompt {
+    border-top: 1px solid rgba(229, 231, 235, 0.8);
+    color: #4b5563;
+    font-size: 0.875rem;
+    margin: 0;
+    padding-top: 1rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .modern-blue-signup-form .modern-blue-login-prompt a {
+    color: #0f6cb5;
+    font-weight: 700;
+  }
+
+  .modern-blue-signup-form .modern-blue-login-prompt a:hover {
+    color: #0d5d9f;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 991.98px) {
+    #page {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+
+    .modern-blue-auth-shell {
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .modern-blue-auth-brand {
+      flex-basis: auto;
+      max-width: 100%;
+      min-width: 0;
+      padding: 2.25rem 1.25rem;
+    }
+
+    .modern-blue-auth-logo {
+      max-height: 10.5rem;
+    }
+
+    .modern-blue-auth-content {
+      padding: 2rem 1.25rem 1.5rem;
+    }
+
+    .modern-blue-signup-form .modern-blue-signup-section-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .modern-blue-signup-form .modern-blue-signup-section-title {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .modern-blue-auth-brand-title {
+      font-size: 1.5rem;
+    }
+
+    .modern-blue-auth-content {
+      padding: 1.5rem 0.9rem 1.1rem;
+    }
+
+    .loginform::before {
+      font-size: 1.7rem;
+    }
+
+    .modern-blue-signup-form .mform {
+      padding: 1rem 0.9rem 0.35rem;
+    }
   }
 }
 
@@ -404,3 +1177,4 @@ a {
 #page-content {
   animation: fadeIn 0.5s ease-out;
 }
+
