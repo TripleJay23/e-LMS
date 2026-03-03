@@ -341,3 +341,4 @@ Stack trace:
 2026/02/26 12:26:56 [error] 11316#25016: *395 connect() failed (10061: No connection could be made because the target machine actively refused it) while connecting to upstream, client: 127.0.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", upstream: "fastcgi://127.0.0.1:9000", host: "localhost:8081", referrer: "http://localhost:8081/"
 2026/02/26 20:40:49 [notice] 8592#2888: signal process started
 2026/02/26 20:40:49 [error] 8592#2888: OpenEvent("Global\ngx_reload_20624") failed (2: The system cannot find the file specified)
+2026/02/27 19:41:42 [error] 7892#13188: *18 connect() failed (10061: No connection could be made because the target machine actively refused it) while connecting to upstream, client: 127.0.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "fastcgi://127.0.0.1:9000", host: "localhost:8081", referrer: "http://localhost:8081/"
