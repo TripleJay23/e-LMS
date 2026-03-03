@@ -450,6 +450,70 @@ a {
     text-decoration: underline;
   }
 
+  &#page-login-index .modern-blue-auth-shell {
+    max-width: 954px;
+    min-height: 600px;
+  }
+
+  &#page-login-index .modern-blue-auth-brand {
+    flex: 0 0 44.65%;
+    max-width: 44.65%;
+  }
+
+  &#page-login-index .modern-blue-auth-content {
+    padding: 3rem 4rem 3rem 2.75rem;
+  }
+
+  &#page-login-index .modern-blue-auth-content-inner {
+    max-width: 427px;
+  }
+
+  &#page-login-index .loginform::before {
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  &#page-login-index .loginform .login-form {
+    gap: 0.9rem;
+  }
+
+  &#page-login-index .loginform .form-control {
+    min-height: 2.7rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  &#page-login-index .loginform #loginbtn {
+    min-height: 2.75rem;
+  }
+
+  &#page-login-index .loginform .login-signup .btn-secondary,
+  &#page-login-index .loginform #guestlogin .btn-secondary {
+    min-height: 2.45rem;
+  }
+
+  &#page-login-index .loginform .login-divider {
+    margin: 0.7rem 0;
+  }
+
+  &#page-login-index .loginform .login-form-recaptcha {
+    margin-top: -0.2rem;
+    margin-bottom: 0 !important;
+  }
+
+  &#page-login-index .loginform .login-form-forgotpassword {
+    margin-bottom: 0 !important;
+  }
+
+  &#page-login-index .loginform .login-instructions {
+    display: none !important;
+  }
+
+  &#page-login-index .loginform .login-signup {
+    margin-top: 0.75rem;
+  }
+
   &#page-login-signup .modern-blue-auth-content {
     align-items: flex-start;
     padding: 2.5rem 1.6rem 2rem;
@@ -749,17 +813,25 @@ a {
   .modern-blue-signup-form .modern-blue-signup-utility {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-top: 0.2rem;
   }
 
-  .modern-blue-signup-form .modern-blue-signup-recaptcha,
-  .modern-blue-signup-form #fitem_id_recaptcha_element .felement {
+  .modern-blue-signup-form .modern-blue-signup-recaptcha {
     background: rgba(249, 250, 251, 0.82);
     border: 1px solid #d3d5d6;
     border-radius: 0.5rem;
     min-height: 4.3rem;
     padding: 0.75rem 0.95rem;
+  }
+
+  .modern-blue-signup-form #fitem_id_recaptcha_element .felement {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 0;
+    padding: 0;
   }
 
   .modern-blue-signup-form .modern-blue-signup-recaptcha {
@@ -793,7 +865,7 @@ a {
   }
 
   .modern-blue-signup-form #fitem_id_recaptcha_element {
-    margin: 0;
+    margin: 0 0 0.3rem;
   }
 
   .modern-blue-signup-form #fitem_id_recaptcha_element .col-md-3 {
@@ -807,12 +879,26 @@ a {
     padding-right: 0;
   }
 
+  .modern-blue-signup-form #fitem_id_passwordpolicyinfo {
+    display: none !important;
+  }
+
+  .modern-blue-signup-form .modern-blue-signup-captcha-note {
+    background: rgba(249, 250, 251, 0.82);
+    border: 1px solid #d3d5d6;
+    border-radius: 0.5rem;
+    color: #4b5563;
+    font-size: 0.8125rem;
+    margin: 0;
+    padding: 0.85rem 0.95rem;
+  }
+
   .modern-blue-signup-form .modern-blue-signup-actions-row,
   .modern-blue-signup-form #fgroup_id_buttonar.modern-blue-signup-actions-row,
   .modern-blue-signup-form .fitem_actionbuttons.modern-blue-signup-actions-row {
     border-top: 1px solid rgba(229, 231, 235, 0.8);
     margin: 0;
-    padding-top: 1rem;
+    padding-top: 0.8rem;
   }
 
   .modern-blue-signup-form .modern-blue-signup-actions-row .col-md-3 {
@@ -934,6 +1020,14 @@ a {
       padding: 2rem 1.25rem 1.5rem;
     }
 
+    &#page-login-index .modern-blue-auth-content {
+      padding: 2rem 1.5rem 1.6rem;
+    }
+
+    &#page-login-index .loginform .login-form {
+      gap: 1rem;
+    }
+
     .modern-blue-signup-form .modern-blue-signup-section-panel {
       grid-template-columns: 1fr;
     }
@@ -956,8 +1050,18 @@ a {
       font-size: 1.7rem;
     }
 
+    &#page-login-index .loginform::before {
+      font-size: 1.3rem;
+      margin-bottom: 0.85rem;
+    }
+
     .modern-blue-signup-form .mform {
       padding: 1rem 0.9rem 0.35rem;
+    }
+
+    .modern-blue-signup-form #fitem_id_recaptcha_element .felement iframe {
+      transform: scale(0.9);
+      transform-origin: left top;
     }
   }
 }

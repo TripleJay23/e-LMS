@@ -162,18 +162,6 @@ require(['jquery'], function($) {
         );
     }
 
-    var addHint = function(rowSelector, text) {
-        var $row = $form.find(rowSelector).first();
-        var $feedback = $row.find('.form-control-feedback').first();
-        if (!$row.length || !$feedback.length || $row.find('.modern-blue-field-hint').length) {
-            return;
-        }
-        $('<p>', {
-            'class': 'modern-blue-field-hint',
-            'text': text
-        }).insertBefore($feedback);
-    };
-
     var setPlaceholder = function(inputSelector, text) {
         var $input = $form.find(inputSelector).first();
         if ($input.length && !$input.attr('placeholder')) {
@@ -181,19 +169,13 @@ require(['jquery'], function($) {
         }
     };
 
-    addHint('#fitem_id_username', 'Lowercase letters only.');
-    addHint('#fitem_id_password', 'Min 8 chars, 1 digit, 1 lowercase.');
-
     setPlaceholder('#id_username', 'Enter username');
     setPlaceholder('#id_password', 'Enter password');
     setPlaceholder('#id_email', 'name@example.com');
     setPlaceholder('#id_email2', 'name@example.com');
     setPlaceholder('#id_profile_field_reg_number', 'Enter registration number');
 
-    var $passwordPolicy = $form.find('#fitem_id_passwordpolicyinfo .form-control-static').first();
-    if ($passwordPolicy.length) {
-        $passwordPolicy.text('Min 8 chars, include digit, uppercase, lowercase, and symbol.');
-    }
+    $form.find('#fitem_id_passwordpolicyinfo').remove();
 
     var $utilityRows = $form.children(utilitySelector);
     var $utility = $('<div>', {'class': 'modern-blue-signup-utility'});
@@ -203,14 +185,10 @@ require(['jquery'], function($) {
     if ($recaptchaRow.length) {
         $utility.append($recaptchaRow);
     } else {
-        var $mockRecaptcha = $('<div>', {
-            'class': 'modern-blue-signup-recaptcha',
-            'aria-hidden': 'true'
-        });
-        $mockRecaptcha.append($('<span>', {'class': 'modern-blue-signup-recaptcha-check'}));
-        $mockRecaptcha.append($('<span>', {'class': 'modern-blue-signup-recaptcha-text', 'text': "I'm not a robot"}));
-        $mockRecaptcha.append($('<span>', {'class': 'modern-blue-signup-recaptcha-badge', 'text': 'reCAPTCHA'}));
-        $utility.append($mockRecaptcha);
+        $utility.append($('<p>', {
+            'class': 'modern-blue-signup-captcha-note',
+            'text': 'Security check is currently unavailable. Please contact the administrator.'
+        }));
     }
 
     if ($actionRows.length) {

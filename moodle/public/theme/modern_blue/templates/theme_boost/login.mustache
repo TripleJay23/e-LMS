@@ -57,4 +57,15 @@ require(['theme_boost/loader'], function() {
 require(['theme_modern_blue/theme'], function(Theme) {
     Theme.init();
 });
+require(['jquery'], function($) {
+    var $page = $('body#page-login-index');
+    if (!$page.length) {
+        return;
+    }
+    $page.find('.loginform .login-instructions').each(function() {
+        var $instructions = $(this);
+        $instructions.prev('.login-divider').remove();
+        $instructions.remove();
+    });
+});
 {{/js}}
