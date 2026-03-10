@@ -259,6 +259,347 @@ body#page-site-index.notloggedin {
   }
 }
 
+// Authenticated pages header - apply to all logged-in roles.
+body.modern-blue-authenticated-user {
+  .navbar.fixed-top,
+  .navbar-bootswatch {
+    background-color: #0f6cbd !important;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    min-height: 64px;
+
+    .container-fluid {
+      align-items: center;
+      min-height: 64px;
+      padding-left: 32px;
+      padding-right: 32px;
+    }
+
+    .navbar-brand {
+      margin-right: 1rem !important;
+      padding: 0 !important;
+    }
+
+    .primary-navigation .moremenu.navigation {
+      height: auto;
+      opacity: 1;
+    }
+
+    .primary-navigation .moremenu .nav-tabs,
+    .primary-navigation .moremenu .more-nav {
+      background: transparent;
+      border: 0;
+      margin: 0;
+    }
+
+    .primary-navigation .moremenu .nav-link {
+      align-items: center;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 6px;
+      color: #fff !important;
+      display: inline-flex;
+      font-size: 14px;
+      font-weight: 500;
+      height: 36px;
+      line-height: 20px;
+      margin: 0;
+      min-height: 36px;
+      padding: 8px 12px !important;
+    }
+
+    .primary-navigation .moremenu .nav-link.active,
+    .primary-navigation .moremenu .nav-link[aria-current="true"] {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-bottom-color: transparent !important;
+      color: #fff !important;
+    }
+
+    .primary-navigation .moremenu .nav-link:hover,
+    .primary-navigation .moremenu .nav-link:focus {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #fff !important;
+    }
+
+    #usernavigation {
+      align-items: center;
+      display: flex;
+      height: auto !important;
+    }
+
+    // Match Figma styling for the edit mode control in header.
+    #usernavigation .usermenu-container + .divider.border-start.h-75.align-self-center.ms-1.me-3 {
+      align-self: center !important;
+      border-left: 1px solid rgba(255, 255, 255, 0.26) !important;
+      flex: 0 0 auto;
+      height: 1.9rem !important;
+      margin-left: 0.95rem !important;
+      margin-right: 0.85rem !important;
+      opacity: 1;
+      width: 0;
+    }
+
+    #usernavigation .editmode-switch-form {
+      align-items: center;
+      display: inline-flex;
+      margin: 0;
+      min-height: 2rem;
+      padding: 0;
+    }
+
+    #usernavigation .editmode-switch-form .input-group {
+      align-items: center;
+      display: inline-flex;
+      flex-wrap: nowrap;
+      gap: 0.65rem;
+    }
+
+    #usernavigation .editmode-switch-form label {
+      color: rgba(255, 255, 255, 0.94) !important;
+      font-size: 1.02rem;
+      font-weight: 500;
+      line-height: 1;
+      margin: 0 !important;
+      white-space: nowrap;
+    }
+
+    #usernavigation .editmode-switch-form label.text-primary {
+      color: #ffffff !important;
+    }
+
+    #usernavigation .editmode-switch-form .form-switch {
+      margin: 0;
+      min-height: 0;
+      padding-left: 0;
+    }
+
+    #usernavigation .editmode-switch-form .form-check-input {
+      background-color: #0d579d !important;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-3 -3 28 28'%3e%3ccircle r='11' cx='11' cy='11' fill='%23ffffff'/%3e%3c/svg%3e");
+      background-position: left 0.22rem center;
+      background-size: 1.55rem 1.55rem;
+      border: 0 !important;
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      height: 2rem;
+      margin: 0;
+      transition:
+        background-position 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+      width: 4.25rem;
+    }
+
+    #usernavigation .editmode-switch-form .form-check-input:checked {
+      background-color: #094b8a !important;
+      background-position: right 0.22rem center;
+    }
+
+    #usernavigation .editmode-switch-form .form-check-input:hover {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+        0 0 0 0.16rem rgba(255, 255, 255, 0.08);
+    }
+
+    #usernavigation .editmode-switch-form .form-check-input:focus {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+        0 0 0 0.2rem rgba(255, 255, 255, 0.2);
+      outline: none;
+    }
+
+    #usernavigation .editmode-switch-form .form-switch .form-check-label {
+      display: none;
+    }
+
+    // Keep plugin toggles readable on blue header.
+    #usernavigation .popover-region,
+    #usernavigation .popover-region-toggle,
+    #usernavigation .popover-region-toggle .icon,
+    #usernavigation .popover-region-toggle i,
+    #usernavigation .popover-region-toggle svg,
+    #usernavigation > .nav-item > .nav-link {
+      color: #fff !important;
+    }
+
+    #usernavigation .popover-region-toggle {
+      border-radius: 999px;
+      min-height: 36px;
+      min-width: 36px;
+    }
+
+    #usernavigation .popover-region-toggle:hover,
+    #usernavigation .popover-region-toggle:focus,
+    #usernavigation > .nav-item > .nav-link:hover,
+    #usernavigation > .nav-item > .nav-link:focus {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #fff !important;
+    }
+
+    // Fix message/notification popover content visibility.
+    #usernavigation .popover-region-container,
+    #usernavigation .popover-region-header-container,
+    #usernavigation .popover-region-content-container,
+    #usernavigation .popover-region-content,
+    #usernavigation .popover-region-footer-container {
+      color: #1f2937 !important;
+    }
+
+    #usernavigation .popover-region-container a,
+    #usernavigation .popover-region-container .content-item-container,
+    #usernavigation .popover-region-container .content-item-container .content-item-body,
+    #usernavigation .popover-region-container .content-item-container .notification-message {
+      color: #1f2937 !important;
+    }
+
+    #usernavigation .popover-region-container .timestamp,
+    #usernavigation .popover-region-container .time,
+    #usernavigation .popover-region-container small {
+      color: #667085 !important;
+    }
+
+    // Keep notification/message item hover readable.
+    #usernavigation .popover-region-container .content-item-container:hover,
+    #usernavigation .popover-region-container .content-item-container.unread:hover,
+    #usernavigation .popover-region-container .content-item-container.selected {
+      background: #eef3f8 !important;
+      border-color: #dbe5f0 !important;
+      color: #1f2937 !important;
+    }
+
+    #usernavigation .popover-region-container .content-item-container:hover a,
+    #usernavigation .popover-region-container .content-item-container:hover .content-item-body,
+    #usernavigation .popover-region-container .content-item-container:hover .notification-message,
+    #usernavigation .popover-region-container .content-item-container:hover .context-link,
+    #usernavigation .popover-region-container .content-item-container:hover .timestamp,
+    #usernavigation .popover-region-container .content-item-container:hover .time,
+    #usernavigation .popover-region-container .content-item-container:hover small {
+      color: #334155 !important;
+    }
+
+    #usernavigation .count-container {
+      border: 2px solid #0f6cbd;
+      color: #fff !important;
+    }
+
+    #usernavigation .usermenu .dropdown-toggle {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.14) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      box-shadow: none;
+      color: #fff !important;
+      display: inline-flex;
+      min-height: 40px;
+      padding: 0.25rem 0.65rem 0.25rem 0.3rem !important;
+    }
+
+    #usernavigation .usermenu .dropdown-toggle:hover,
+    #usernavigation .usermenu .dropdown-toggle:focus {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #fff !important;
+    }
+
+    #usernavigation .usermenu .userbutton {
+      align-items: center;
+      display: inline-flex;
+      gap: 0.5rem;
+    }
+
+    #usernavigation .usermenu .avatar .userpicture,
+    #usernavigation .usermenu .avatar img {
+      border-radius: 999px;
+      height: 30px;
+      width: 30px;
+    }
+
+    #usernavigation .usermenu .usertext,
+    #usernavigation .usermenu .meta {
+      color: rgba(255, 255, 255, 0.95) !important;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    #usernavigation .usermenu .dropdown-menu {
+      border: 1px solid #e6ecf3;
+      border-radius: 16px;
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.15);
+      margin-top: 0.7rem;
+      overflow: hidden;
+      padding: 0.35rem 0;
+      right: 0;
+      top: calc(100% + 0.7rem);
+    }
+
+    // Keep menu placement stable while fading out to prevent exit jitter.
+    #usernavigation .usermenu .dropdown-menu[data-bs-popper] {
+      inset: auto 0 auto auto !important;
+      left: auto !important;
+      margin-top: 0 !important;
+      right: 0 !important;
+      top: calc(100% + 0.7rem) !important;
+      transform: none !important;
+    }
+
+    // Micro-interactions for better dropdown UX.
+    #usernavigation .usermenu .dropdown-menu {
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+      visibility: hidden;
+      will-change: opacity;
+    }
+
+    #usernavigation .usermenu .dropdown-menu.show {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.18s ease, visibility 0s linear 0s;
+      visibility: visible;
+    }
+
+    #usernavigation .popover-region .popover-region-container {
+      transition:
+        height 0.25s,
+        opacity 0.16s ease,
+        visibility 0.16s ease;
+      will-change: opacity, height;
+    }
+
+    #usernavigation .popover-region:not(.collapsed) .popover-region-container {
+      transition:
+        height 0.25s,
+        opacity 0.16s ease,
+        visibility 0s linear 0s;
+    }
+
+    #usernavigation .popover-region.collapsed .popover-region-container {
+      transition:
+        height 0.25s,
+        opacity 0.16s ease,
+        visibility 0s linear 0.16s;
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  body.modern-blue-authenticated-user {
+    .navbar.fixed-top,
+    .navbar-bootswatch {
+      min-height: 56px;
+
+      .container-fluid {
+        min-height: 56px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    }
+  }
+}
+
 // Sidebar / Drawer
 .drawer-content {
   @include glassmorphism;
