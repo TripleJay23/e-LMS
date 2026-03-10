@@ -114,7 +114,6 @@ e-LMS/
 │   │   ├── database_setup.sql              # DB schema
 │   │   └── seed_data.sql                   # Initial data
 │   ├── User Management
-│   │   ├── create_students.php             # Create student accounts
 │   │   ├── create_lecturers.php            # Create facilitator accounts
 │   │   └── create_hod.php                  # Create HOD account
 │   ├── Course Management
@@ -298,7 +297,6 @@ php scripts/run_cron.php
 | `create_categories.php`          | Create categories           | ⚠️ Test first      |
 | `cleanup_stale_courses.php`      | Remove stale shared copies  | ⚠️ Destructive     |
 | `normalize_shared_course_links.php` | Canonicalize shared links | ⚠️ Test first      |
-| `create_students.php`            | Create student accounts     | ⚠️ Test first      |
 | `create_lecturers.php`           | Create facilitator accounts | ⚠️ Test first      |
 | `enrol_student.php`              | Enroll students             | ⚠️ Test first      |
 | `cross_enroll_shared.php`        | Legacy cross-enrollment     | ⚠️ Legacy          |

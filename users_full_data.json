@@ -1,162 +1,162 @@
 [
     {
         "username": "admin",
-        "firstname": "Admin",
-        "lastname": "User",
+        "firstname": "Triple",
+        "lastname": "Jay",
         "email": "jtriple188@gmail.com",
-        "password": "(Manual)",
+        "password": "(not exported)",
         "role": "Administrator",
         "courses_enrolled": "",
         "courses_teaching": ""
     },
     {
-        "username": "bcs_y1_student1",
-        "firstname": "BCS Y1",
-        "lastname": "Student 1",
-        "email": "bcs_y1_student1@student.example.com",
-        "password": "Student@2026",
-        "role": "Student",
-        "courses_enrolled": "Computer Systems Architecture (ITU 07104), Discrete Mathematics (ITU 07210), Development Perspectives (ITU 07209), Business Communication (ITU 07101), Probability and Statistics (ITU 07213), Business Computer Applications (ITU 07102), Computer Fundamentals (ITU 07103), Foundation of Analysis (ITU 07107), Database Systems Development (ITU 07105), Principles of Programming (ITU 07212), Computer Networking (ITU 07208), Computer Graphic Design (ITU 07211)",
-        "courses_teaching": ""
-    },
-    {
-        "username": "bcs_y2_student1",
-        "firstname": "BCS Y2",
-        "lastname": "Student 1",
-        "email": "bcs_y2_student1@student.example.com",
-        "password": "Student@2026",
-        "role": "Student",
-        "courses_enrolled": "Operating Systems (ITU 07320), Distributed Computing Systems (ITU 07318), Distributed Database (ITU 07317), Artificial Intelligence (ITU 07424), Internet Programming and Applications (ITU 07427), Entrepreneurship (ITU 07425), Web Design (ITU 07323), Research Methodology (ITU 07321), Object Oriented Programming (ITU 07322), Information Security (ITU 07426), System Analysis and Design (ITU 07428), Wireless Communication (ITU 07430), Industrial Practical Training (ITU 07431)",
-        "courses_teaching": ""
-    },
-    {
-        "username": "bcs_y3_student1",
-        "firstname": "BCS Y3",
-        "lastname": "Student 1",
-        "email": "bcs_y3_student1@student.example.com",
-        "password": "Student@2026",
-        "role": "Student",
-        "courses_enrolled": "Interactive Multimedia (ITU 08107), Mobile Computing (ITU 08215), Computer Security (ITU 08213), Cryptology and Coding Theory (ITU 08211), Data Structure and Algorithms (ITU 08209), Individual Project (ITU 08217), Open Source Software Development (ITU 08102), Network Management and Administration (ITU 08105), Social and Ethical Issues in Computing (ITU 08103), IT Project Management (ITU 08101), Data Mining (ITU 08104)",
-        "courses_teaching": ""
-    },
-    {
-        "username": "bit_y1_student1",
-        "firstname": "BIT Y1",
-        "lastname": "Student 1",
-        "email": "bit_y1_student1@student.example.com",
-        "password": "Student@2026",
-        "role": "Student",
-        "courses_enrolled": "Digital Logic and Computer Organization (ITU 07106), Database Implementation and Management (ITU 07214), Development Perspectives (ITU 07209), Business Communication (ITU 07101), Probability and Statistics (ITU 07213), Business Computer Applications (ITU 07102), Computer Fundamentals (ITU 07103), Foundation of Analysis (ITU 07107), Database Systems Development (ITU 07105), Principles of Programming (ITU 07212), Computer Networking (ITU 07208), Computer Graphic Design (ITU 07211)",
-        "courses_teaching": ""
-    },
-    {
-        "username": "bit_y2_student1",
-        "firstname": "BIT Y2",
-        "lastname": "Student 1",
-        "email": "bit_y2_student1@student.example.com",
-        "password": "Student@2026",
-        "role": "Student",
-        "courses_enrolled": "Management Information Systems (ITU 07319), Data Routing and Switching (ITU 07316), Business Law (ITU 07315), Supporting Personal Computers (ITU 07429), Internet Programming and Applications (ITU 07427), Entrepreneurship (ITU 07425), Web Design (ITU 07323), Research Methodology (ITU 07321), Object Oriented Programming (ITU 07322), Information Security (ITU 07426), System Analysis and Design (ITU 07428), Wireless Communication (ITU 07430), Industrial Practical Training (ITU 07431)",
-        "courses_teaching": ""
-    },
-    {
-        "username": "bit_y3_student1",
-        "firstname": "BIT Y3",
-        "lastname": "Student 1",
-        "email": "bit_y3_student1@student.example.com",
-        "password": "Student@2026",
-        "role": "Student",
-        "courses_enrolled": "Information System Auditing (ITU 08106), Programming for Mobile Device (ITU 08216), Information System Management (ITU 08214), Business Information System Re-engineering (ITU 08212), E-commerce and Technology (ITU 08210), Cybercrimes and Computer Law (ITU 08208), Individual Project (ITU 08217), Open Source Software Development (ITU 08102), Network Management and Administration (ITU 08105), Social and Ethical Issues in Computing (ITU 08103), IT Project Management (ITU 08101), Data Mining (ITU 08104)",
+        "username": "hod_informatics",
+        "firstname": "Mr.",
+        "lastname": "Fikiri",
+        "email": "hod.informatics@example.com",
+        "password": "(not exported)",
+        "role": "Head of Department",
+        "courses_enrolled": "",
         "courses_teaching": ""
     },
     {
         "username": "dr_achieng",
         "firstname": "Dr. Jane",
         "lastname": "Achieng",
-        "email": "jane.achieng@example.com",
-        "password": "Lecturer@2026",
+        "email": "jane.achieng@gmail.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Computer Systems Architecture (ITU 07104), Artificial Intelligence (ITU 07424), Cryptology and Coding Theory (ITU 08211), Database Implementation and Management (ITU 07214), Management Information Systems (ITU 07319), Information System Auditing (ITU 08106), Information System Management (ITU 08214), Computer Networking (ITU 07208), Network Management and Administration (ITU 08105)"
+        "courses_teaching": "Database Systems Development (ITU 07105-SHARED), Discrete Mathematics (ITU 07210), Business Law (ITU 07315), Information Security (ITU 07426-SHARED), E-commerce and Technology (ITU 08210), Individual Project (ITU 08217-SHARED)"
     },
     {
         "username": "dr_kamau",
         "firstname": "Dr. Peter",
         "lastname": "Kamau",
-        "email": "peter.kamau@example.com",
-        "password": "Lecturer@2026",
+        "email": "peter.kamau@gmail.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Distributed Database (ITU 07317), Computer Security (ITU 08213), Data Routing and Switching (ITU 07316), Business Information System Re-engineering (ITU 08212), Business Computer Applications (ITU 07102), Object Oriented Programming (ITU 07322), System Analysis and Design (ITU 07428), Principles of Programming (ITU 07212), Social and Ethical Issues in Computing (ITU 08103)"
+        "courses_teaching": "Business Communication (ITU 07101-SHARED), Digital Logic and Computer Organization (ITU 07106), Data Routing and Switching (ITU 07316), Object Oriented Programming (ITU 07322-SHARED), Industrial Practical Training (ITU 07431-SHARED), Data Mining (ITU 08104-SHARED), Cryptology and Coding Theory (ITU 08211)"
     },
     {
         "username": "dr_mwangi",
         "firstname": "Dr. James",
         "lastname": "Mwangi",
-        "email": "james.mwangi@example.com",
-        "password": "Lecturer@2026",
+        "email": "james.mwangi@gmail.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Business Law (ITU 07315), E-commerce and Technology (ITU 08210), Business Communication (ITU 07101), Internet Programming and Applications (ITU 07427), Research Methodology (ITU 07321), Computer Graphic Design (ITU 07211), Open Source Software Development (ITU 08102)"
+        "courses_teaching": "Computer Graphic Design (ITU 07211-SHARED), Distributed Database (ITU 07317), Internet Programming and Applications (ITU 07427-SHARED), Business Information System Re-engineering (ITU 08212)"
     },
     {
         "username": "dr_wanjiru",
         "firstname": "Dr. Mary",
         "lastname": "Wanjiru",
-        "email": "mary.wanjiru@example.com",
-        "password": "Lecturer@2026",
+        "email": "mary.wanjiru@gmail.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Programming for Mobile Device (ITU 08216), Cybercrimes and Computer Law (ITU 08208), Probability and Statistics (ITU 07213), Computer Fundamentals (ITU 07103), Foundation of Analysis (ITU 07107), Web Design (ITU 07323), Data Mining (ITU 08104)"
-    },
-    {
-        "username": "hod_informatics",
-        "firstname": "Dr. Head",
-        "lastname": "Informatics",
-        "email": "hod.informatics@example.com",
-        "password": "Head@2026",
-        "role": "Head of Department",
-        "courses_enrolled": "",
-        "courses_teaching": ""
+        "courses_teaching": "Business Computer Applications (ITU 07102-SHARED), Foundation of Analysis (ITU 07107-SHARED), Distributed Computing Systems (ITU 07318), Web Design (ITU 07323-SHARED), IT Project Management (ITU 08101-SHARED), Network Management and Administration (ITU 08105-SHARED), Computer Security (ITU 08213)"
     },
     {
         "username": "mr_odhiambo",
         "firstname": "Mr. David",
         "lastname": "Odhiambo",
-        "email": "david.odhiambo@example.com",
-        "password": "Lecturer@2026",
+        "email": "david.odhiambo@outlook.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Distributed Computing Systems (ITU 07318), Interactive Multimedia (ITU 08107), Mobile Computing (ITU 08215), Supporting Personal Computers (ITU 07429), Information Security (ITU 07426), IT Project Management (ITU 08101)"
+        "courses_teaching": "Principles of Programming (ITU 07212-SHARED), Management Information Systems (ITU 07319), Artificial Intelligence (ITU 07424), System Analysis and Design (ITU 07428-SHARED), Information System Auditing (ITU 08106), Information System Management (ITU 08214)"
     },
     {
         "username": "ms_otieno",
         "firstname": "Ms. Sarah",
         "lastname": "Otieno",
-        "email": "sarah.otieno@example.com",
-        "password": "Lecturer@2026",
+        "email": "sarah.otieno@gmail.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Development Perspectives (ITU 07209)"
+        "courses_teaching": "Computer Fundamentals (ITU 07103-SHARED), Computer Networking (ITU 07208-SHARED), Operating Systems (ITU 07320), Supporting Personal Computers (ITU 07429), Open Source Software Development (ITU 08102-SHARED), Interactive Multimedia (ITU 08107), Mobile Computing (ITU 08215)"
     },
     {
         "username": "prof_kimani",
         "firstname": "Prof. John",
         "lastname": "Kimani",
-        "email": "john.kimani@example.com",
-        "password": "Lecturer@2026",
+        "email": "john.kimani@gmail.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Discrete Mathematics (ITU 07210), Operating Systems (ITU 07320), Data Structure and Algorithms (ITU 08209), Wireless Communication (ITU 07430), Individual Project (ITU 08217)"
+        "courses_teaching": "Computer Systems Architecture (ITU 07104), Probability and Statistics (ITU 07213-SHARED), Entrepreneurship (ITU 07425-SHARED), Cybercrimes and Computer Law (ITU 08208), Programming for Mobile Device (ITU 08216)"
     },
     {
         "username": "prof_njoroge",
         "firstname": "Prof. Grace",
         "lastname": "Njoroge",
-        "email": "grace.njoroge@example.com",
-        "password": "Lecturer@2026",
+        "email": "grace.njoroge@outlook.com",
+        "password": "(not exported)",
         "role": "Lecturer",
         "courses_enrolled": "",
-        "courses_teaching": "Digital Logic and Computer Organization (ITU 07106), Database Systems Development (ITU 07105), Entrepreneurship (ITU 07425), Industrial Practical Training (ITU 07431)"
+        "courses_teaching": "Development Perspectives (ITU 07209-SHARED), Database Implementation and Management (ITU 07214), Research Methodology (ITU 07321-SHARED), Wireless Communication (ITU 07430-SHARED), Social and Ethical Issues in Computing (ITU 08103-SHARED), Data Structure and Algorithms (ITU 08209)"
+    },
+    {
+        "username": "bcs_y1_student1",
+        "firstname": "Paulina",
+        "lastname": "John",
+        "email": "Paulina@gmail.com",
+        "password": "(not exported)",
+        "role": "Student",
+        "courses_enrolled": "Business Communication (ITU 07101-SHARED), Business Computer Applications (ITU 07102-SHARED), Computer Fundamentals (ITU 07103-SHARED), Computer Systems Architecture (ITU 07104), Database Systems Development (ITU 07105-SHARED), Foundation of Analysis (ITU 07107-SHARED), Computer Networking (ITU 07208-SHARED), Development Perspectives (ITU 07209-SHARED), Discrete Mathematics (ITU 07210), Computer Graphic Design (ITU 07211-SHARED), Principles of Programming (ITU 07212-SHARED), Probability and Statistics (ITU 07213-SHARED)",
+        "courses_teaching": ""
+    },
+    {
+        "username": "bcs_y2_student1",
+        "firstname": "Howard",
+        "lastname": "Dominic",
+        "email": "Howard@gmail.com",
+        "password": "(not exported)",
+        "role": "Student",
+        "courses_enrolled": "Distributed Database (ITU 07317), Distributed Computing Systems (ITU 07318), Operating Systems (ITU 07320), Research Methodology (ITU 07321-SHARED), Object Oriented Programming (ITU 07322-SHARED), Web Design (ITU 07323-SHARED), Artificial Intelligence (ITU 07424), Entrepreneurship (ITU 07425-SHARED), Information Security (ITU 07426-SHARED), Internet Programming and Applications (ITU 07427-SHARED), System Analysis and Design (ITU 07428-SHARED), Wireless Communication (ITU 07430-SHARED), Industrial Practical Training (ITU 07431-SHARED)",
+        "courses_teaching": ""
+    },
+    {
+        "username": "bcs_y3_student1",
+        "firstname": "Hansy",
+        "lastname": "Godfrey",
+        "email": "HansyGo@gmail.com",
+        "password": "(not exported)",
+        "role": "Student",
+        "courses_enrolled": "IT Project Management (ITU 08101-SHARED), Open Source Software Development (ITU 08102-SHARED), Social and Ethical Issues in Computing (ITU 08103-SHARED), Data Mining (ITU 08104-SHARED), Network Management and Administration (ITU 08105-SHARED), Interactive Multimedia (ITU 08107), Data Structure and Algorithms (ITU 08209), Cryptology and Coding Theory (ITU 08211), Computer Security (ITU 08213), Mobile Computing (ITU 08215), Individual Project (ITU 08217-SHARED)",
+        "courses_teaching": ""
+    },
+    {
+        "username": "bit_y1_student1",
+        "firstname": "Hadija",
+        "lastname": "Mohamed",
+        "email": "HadijaMo@gmail.com",
+        "password": "(not exported)",
+        "role": "Student",
+        "courses_enrolled": "Business Communication (ITU 07101-SHARED), Business Computer Applications (ITU 07102-SHARED), Computer Fundamentals (ITU 07103-SHARED), Database Systems Development (ITU 07105-SHARED), Digital Logic and Computer Organization (ITU 07106), Foundation of Analysis (ITU 07107-SHARED), Computer Networking (ITU 07208-SHARED), Development Perspectives (ITU 07209-SHARED), Computer Graphic Design (ITU 07211-SHARED), Principles of Programming (ITU 07212-SHARED), Probability and Statistics (ITU 07213-SHARED), Database Implementation and Management (ITU 07214)",
+        "courses_teaching": ""
+    },
+    {
+        "username": "bit_y2_student1",
+        "firstname": "Jackob",
+        "lastname": "Silayo",
+        "email": "Jackob@gmail.com",
+        "password": "(not exported)",
+        "role": "Student",
+        "courses_enrolled": "Business Law (ITU 07315), Data Routing and Switching (ITU 07316), Management Information Systems (ITU 07319), Research Methodology (ITU 07321-SHARED), Object Oriented Programming (ITU 07322-SHARED), Web Design (ITU 07323-SHARED), Entrepreneurship (ITU 07425-SHARED), Information Security (ITU 07426-SHARED), Internet Programming and Applications (ITU 07427-SHARED), System Analysis and Design (ITU 07428-SHARED), Supporting Personal Computers (ITU 07429), Wireless Communication (ITU 07430-SHARED), Industrial Practical Training (ITU 07431-SHARED)",
+        "courses_teaching": ""
+    },
+    {
+        "username": "bit_y3_student1",
+        "firstname": "Mwila",
+        "lastname": "Ishegize",
+        "email": "MrDinoTz@gmail.com",
+        "password": "(not exported)",
+        "role": "Student",
+        "courses_enrolled": "IT Project Management (ITU 08101-SHARED), Open Source Software Development (ITU 08102-SHARED), Social and Ethical Issues in Computing (ITU 08103-SHARED), Data Mining (ITU 08104-SHARED), Network Management and Administration (ITU 08105-SHARED), Information System Auditing (ITU 08106), Cybercrimes and Computer Law (ITU 08208), E-commerce and Technology (ITU 08210), Business Information System Re-engineering (ITU 08212), Information System Management (ITU 08214), Programming for Mobile Device (ITU 08216), Individual Project (ITU 08217-SHARED)",
+        "courses_teaching": ""
     }
 ]
