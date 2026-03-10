@@ -61,9 +61,6 @@ A Moodle-based e-Learning Management System customized for the Faculty of Inform
 | --------- | ------------------------------------------------ | ----------- | ----------- | --------- |
 | **BIT**   | Bachelor Degree in Information Technology        | Bachelor    | 6 semesters | ✅ Active |
 | **BCS**   | Bachelor Degree in Computer Science              | Bachelor    | 6 semesters | ✅ Active |
-| **DIT**   | Ordinary Diploma in Information Technology       | Diploma     | 4 semesters | Planned   |
-| **DCS**   | Ordinary Diploma in Computer Science             | Diploma     | 4 semesters | Planned   |
-| **BTCIT** | Basic Technician Certificate in Computing and IT | Certificate | 2 semesters | Planned   |
 
 ---
 
