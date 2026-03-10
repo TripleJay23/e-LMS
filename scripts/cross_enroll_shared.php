@@ -1,23 +1,30 @@
 #!/usr/bin/env php
 <?php
 /**
- * Cross-Enroll Students in Shared Courses
- * Enrolls BIT students in BCS versions and vice versa
- * Solves the duplicate upload problem
+ * Cross-Enroll Students in Shared Courses (Legacy)
+ * Enrolls BIT students in BCS versions and vice versa when duplicate -BIT/-BCS
+ * course copies exist. Prefer normalize_shared_course_links.php for -SHARED.
  */
 
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->libdir . '/enrollib.php');
+require_once(__DIR__ . '/module_catalog.php');
 
 echo "╔════════════════════════════════════════════════════════╗\n";
 echo "║      Cross-Enrollment for Shared Courses              ║\n";
 echo "╚════════════════════════════════════════════════════════╝\n\n";
 
-// Read shared modules
-$json = file_get_contents(__DIR__ . '/../modules_categorized.json');
-$data = json_decode($json, true);
-$shared_modules = $data['shared'];
+// Read shared modules from canonical list.
+try {
+   $modules = load_module_catalog(__DIR__ . '/modules_corrected.json');
+} catch (RuntimeException $e) {
+   echo "ERROR: " . $e->getMessage() . "\n";
+   exit(1);
+}
+
+$groups = split_modules_by_program($modules);
+$shared_modules = $groups['shared'];
 
 echo "Found " . count($shared_modules) . " shared modules to process.\n\n";
 

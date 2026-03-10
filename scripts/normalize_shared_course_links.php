@@ -20,23 +20,20 @@
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->libdir . '/enrollib.php');
+require_once(__DIR__ . '/module_catalog.php');
 
 echo "Normalize Shared Course Links\n";
 echo str_repeat('=', 60) . "\n\n";
 
-$jsonpath = __DIR__ . '/../modules_categorized.json';
-if (!file_exists($jsonpath)) {
-    echo "ERROR: modules_categorized.json not found at {$jsonpath}\n";
+try {
+    $modules = load_module_catalog(__DIR__ . '/modules_corrected.json');
+} catch (RuntimeException $e) {
+    echo "ERROR: " . $e->getMessage() . "\n";
     exit(1);
 }
 
-$raw = json_decode((string)file_get_contents($jsonpath), true);
-if (!is_array($raw) || !isset($raw['shared']) || !is_array($raw['shared'])) {
-    echo "ERROR: Invalid modules_categorized.json shared structure\n";
-    exit(1);
-}
-
-$sharedmodules = $raw['shared'];
+$groups = split_modules_by_program($modules);
+$sharedmodules = $groups['shared'];
 if (empty($sharedmodules)) {
     echo "No shared modules found. Nothing to do.\n";
     exit(0);
@@ -63,29 +60,6 @@ if (!$manualenrol) {
 $prevnoemailever = $CFG->noemailever ?? false;
 $CFG->noemailever = true;
 
-/**
- * Resolve year/semester from module row.
- */
-function resolve_year_sem(array $module): array {
-    if (!empty($module['year']) && !empty($module['semester_num'])) {
-        return [(int)$module['year'], (int)$module['semester_num']];
-    }
-
-    $semestername = (string)($module['semester'] ?? '');
-    $map = [
-        'Semester I' => [1, 1],
-        'Semester II' => [1, 2],
-        'Semester III' => [2, 1],
-        'Semester IV' => [2, 2],
-        'Semester V' => [3, 1],
-        'Semester VI' => [3, 2],
-    ];
-    if (isset($map[$semestername])) {
-        return $map[$semestername];
-    }
-    return [1, 1];
-}
-
 $stats = [
     'modules' => 0,
     'missingcanonical' => 0,
@@ -103,7 +77,7 @@ foreach ($sharedmodules as $module) {
     }
     $stats['modules']++;
 
-    [$year, $semester] = resolve_year_sem($module);
+    [$year, $semester] = resolve_year_semester($module);
     $canonicalshortname = $code . '-SHARED';
     $legacyshortname = $code;
 

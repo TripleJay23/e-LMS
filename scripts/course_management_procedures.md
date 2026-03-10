@@ -76,5 +76,5 @@ pg_dump -h localhost -U moodleuser -d moodle > backup.sql
 | `apply_full_course_template.php` | Applies course images and summary styling              |
 | `run_cron.php`                   | Runs Moodle cron                                       |
 
-_Last Updated: 2026-02-26_
+_Last Updated: 2026-03-10_
 

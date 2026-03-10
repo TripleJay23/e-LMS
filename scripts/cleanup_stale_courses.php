@@ -9,17 +9,26 @@
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once(__DIR__ . '/module_catalog.php');
 
 echo "╔════════════════════════════════════════════════════════╗\n";
 echo "║       Cleanup Stale Duplicate Courses                 ║\n";
 echo "╚════════════════════════════════════════════════════════╝\n\n";
 
-// Load shared module codes
-$json = file_get_contents(__DIR__ . '/../modules_categorized.json');
-$data = json_decode($json, true);
+// Load shared module codes from canonical list
+try {
+   $modules = load_module_catalog(__DIR__ . '/modules_corrected.json');
+} catch (RuntimeException $e) {
+   echo "ERROR: " . $e->getMessage() . "\n";
+   exit(1);
+}
+
+$groups = split_modules_by_program($modules);
 $shared_codes = [];
-foreach ($data['shared'] as $m) {
-   $shared_codes[] = $m['code'];
+foreach ($groups['shared'] as $m) {
+   if (!empty($m['code'])) {
+      $shared_codes[] = $m['code'];
+   }
 }
 
 echo "Shared module codes: " . count($shared_codes) . "\n\n";

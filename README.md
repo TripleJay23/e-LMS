@@ -5,7 +5,7 @@
 A Moodle-based e-Learning Management System customized for the Faculty of Informatics, supporting BIT (Bachelor in Information Technology) and BCS (Bachelor in Computer Science) programs.
 
 **System Status:** ✅ Fully Operational  
-**Last Updated:** February 21, 2026  
+**Last Updated:** March 10, 2026  
 **Version:** 3.0
 
 ---
@@ -15,13 +15,13 @@ A Moodle-based e-Learning Management System customized for the Faculty of Inform
 ### Users
 
 - **Students:** 6
-- **Facilitators (Teachers):** 7
-- **HOD (Manager):** 1 � `hod_informatics` (department-level access)
+- **Facilitators (Teachers):** 8
+- **HOD (Manager):** 1 - `hod_informatics` (department-level access)
 - **Admin:** 1
 
 ### Courses
 
-- **Total Active Courses:** 48 (BIT + BCS + Shared modules)
+- **Total Active Courses:** 48 (25 shared, 12 BIT-only, 11 BCS-only)
 - **HOD Access:** 100% (all courses visible)
 
 ### Security
@@ -102,7 +102,7 @@ Faculty of Informatics (FACULTY_INFORMATICS)
 
 ```
 e-LMS/
-├── moodle/                         # Moodle installation
+├── moodle/                         # Moodle core (not tracked; install separately)
 │   ├── config.php                  # Moodle configuration
 │   ├── public/                     # Web root (Nginx document root)
 │   └── ...
@@ -123,11 +123,13 @@ e-LMS/
 │   ├── Course Management
 │   │   ├── create_all_courses.php          # Create full course structure
 │   │   ├── create_categories.php           # Create category hierarchy
-│   │   └── apply_full_course_template.php  # Apply images & styling
+│   │   ├── apply_full_course_template.php  # Apply images & styling
+│   │   ├── cleanup_stale_courses.php       # Remove stale shared duplicates
+│   │   └── normalize_shared_course_links.php # Canonicalize shared courses
 │   ├── Enrollment
 │   │   ├── enrol_student.php               # Enroll students
 │   │   ├── enrol_hods_in_courses.php       # Enroll HODs
-│   │   ├── cross_enroll_shared.php         # Cross-enroll shared courses
+│   │   ├── cross_enroll_shared.php         # Legacy: cross-enroll -BIT/-BCS
 │   │   └── assign_hod_role.php             # Assign HOD role
 │   ├── Utilities
 │   │   ├── generate_reg_tokens.php         # Generate registration tokens
@@ -163,6 +165,8 @@ All custom tables use the `mdl_custom_` prefix to avoid conflicts with Moodle co
 ---
 
 ## Getting Started
+
+Moodle core is required in `moodle/` (not tracked in git).
 
 ### 1. Start the Server
 
@@ -295,9 +299,13 @@ php scripts/run_cron.php
 | `setup_moodle.php`               | Core config                 | ⚠️ First-time only |
 | `create_all_courses.php`         | Create courses              | ⚠️ Test first      |
 | `create_categories.php`          | Create categories           | ⚠️ Test first      |
+| `cleanup_stale_courses.php`      | Remove stale shared copies  | ⚠️ Destructive     |
+| `normalize_shared_course_links.php` | Canonicalize shared links | ⚠️ Test first      |
 | `create_students.php`            | Create student accounts     | ⚠️ Test first      |
 | `create_lecturers.php`           | Create facilitator accounts | ⚠️ Test first      |
 | `enrol_student.php`              | Enroll students             | ⚠️ Test first      |
+| `cross_enroll_shared.php`        | Legacy cross-enrollment     | ⚠️ Legacy          |
+| `audit_teachers.php`             | Audit teacher assignments   | ✅ Safe            |
 | `apply_full_course_template.php` | Apply images + styling      | ✅ Re-runnable     |
 | `set_recaptcha.php`              | Configure reCAPTCHA         | ✅ Re-runnable     |
 | `generate_reg_tokens.php`        | Generate tokens             | ✅ Re-runnable     |
@@ -324,4 +332,5 @@ For technical support or questions:
 ## License
 
 This system is based on Moodle, which is licensed under GPL v3.
+
 

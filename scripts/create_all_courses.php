@@ -10,37 +10,29 @@
 define('CLI_SCRIPT', true);
 require_once(__DIR__ . '/../moodle/config.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once(__DIR__ . '/module_catalog.php');
 
 echo "╔════════════════════════════════════════════════════════╗\n";
 echo "║      BIT & BCS Course Structure Creation (Refactored) ║\n";
 echo "╚════════════════════════════════════════════════════════╝\n\n";
 
-// Read categorized modules
-$json = file_get_contents(__DIR__ . '/../modules_categorized.json');
-$data = json_decode($json, true);
+// Read canonical modules and split by program.
+try {
+   $modules = load_module_catalog(__DIR__ . '/modules_corrected.json');
+} catch (RuntimeException $e) {
+   echo "ERROR: " . $e->getMessage() . "\n";
+   exit(1);
+}
 
-$shared_modules = $data['shared'];
-$bit_only = $data['bit_only'];
-$bcs_only = $data['bcs_only'];
+$groups = split_modules_by_program($modules);
+$shared_modules = $groups['shared'];
+$bit_only = $groups['bit_only'];
+$bcs_only = $groups['bcs_only'];
 
 echo "Modules to create:\n";
 echo "  • Shared: " . count($shared_modules) . " (Centralized, linked to BIT & BCS)\n";
 echo "  • BIT-only: " . count($bit_only) . "\n";
 echo "  • BCS-only: " . count($bcs_only) . "\n\n";
-
-// Helper function to map semester to year/sem
-function get_year_semester($semester_name)
-{
-   $map = [
-      'Semester I' => ['year' => 1, 'sem' => 1],
-      'Semester II' => ['year' => 1, 'sem' => 2],
-      'Semester III' => ['year' => 2, 'sem' => 1],
-      'Semester IV' => ['year' => 2, 'sem' => 2],
-      'Semester V' => ['year' => 3, 'sem' => 1],
-      'Semester VI' => ['year' => 3, 'sem' => 2],
-   ];
-   return $map[$semester_name] ?? ['year' => 1, 'sem' => 1];
-}
 
 // STEP 1: Create Category Hierarchy
 echo "Step 1: Creating Category Hierarchy\n";
@@ -106,8 +98,8 @@ echo str_repeat("-", 60) . "\n";
 $created_shared = 0;
 
 foreach ($shared_modules as $module) {
-   $ys = get_year_semester($module['semester']);
-   $cat_key = "common_y{$ys['year']}_s{$ys['sem']}";
+   [$year, $sem] = resolve_year_semester($module);
+   $cat_key = "common_y{$year}_s{$sem}";
    $category_id = $DB->get_field('course_categories', 'id', ['idnumber' => $cat_key]);
 
    if (!$category_id) {
@@ -145,8 +137,8 @@ foreach ($shared_modules as $module) {
             $link = new stdClass();
             $link->programid = $prog->id;
             $link->courseid = $course->id;
-            $link->year = $ys['year'];
-            $link->semester = $ys['sem'];
+            $link->year = $year;
+            $link->semester = $sem;
             $link->timecreated = time();
             $DB->insert_record('custom_program_courses', $link);
             echo "  + Linked to {$p_acronym}\n";
@@ -181,8 +173,8 @@ foreach ($bit_only as $module) {
    $shortname = $module['code']; // Keep original shortname for unique ones
 
    if (!$DB->record_exists('course', ['shortname' => $shortname])) {
-      $ys = get_year_semester($module['semester']);
-      $cat_key = "BIT_Y{$ys['year']}_S{$ys['sem']}";
+      [$year, $sem] = resolve_year_semester($module);
+      $cat_key = "BIT_Y{$year}_S{$sem}";
       $category_id = $categories[$cat_key];
 
       $courseData = new stdClass();
@@ -204,8 +196,8 @@ foreach ($bit_only as $module) {
          $link = new stdClass();
          $link->programid = $bit_program->id;
          $link->courseid = $course->id;
-         $link->year = $ys['year'];
-         $link->semester = $ys['sem'];
+         $link->year = $year;
+         $link->semester = $sem;
          $link->timecreated = time();
          $DB->insert_record('custom_program_courses', $link);
       }
@@ -226,8 +218,8 @@ foreach ($bcs_only as $module) {
    $shortname = $module['code'];
 
    if (!$DB->record_exists('course', ['shortname' => $shortname])) {
-      $ys = get_year_semester($module['semester']);
-      $cat_key = "BCS_Y{$ys['year']}_S{$ys['sem']}";
+      [$year, $sem] = resolve_year_semester($module);
+      $cat_key = "BCS_Y{$year}_S{$sem}";
       $category_id = $categories[$cat_key];
 
       $courseData = new stdClass();
@@ -249,8 +241,8 @@ foreach ($bcs_only as $module) {
          $link = new stdClass();
          $link->programid = $bcs_program->id;
          $link->courseid = $course->id;
-         $link->year = $ys['year'];
-         $link->semester = $ys['sem'];
+         $link->year = $year;
+         $link->semester = $sem;
          $link->timecreated = time();
          $DB->insert_record('custom_program_courses', $link);
       }
